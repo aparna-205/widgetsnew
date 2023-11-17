@@ -1,0 +1,662 @@
+<link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="https://pixinvent.com/stack-responsive-bootstrap-4-admin-template/app-assets/css/bootstrap-extended.min.css">
+<link rel="stylesheet" type="text/css" href="https://pixinvent.com/stack-responsive-bootstrap-4-admin-template/app-assets/fonts/simple-line-icons/style.min.css">
+<link rel="stylesheet" type="text/css" href="https://pixinvent.com/stack-responsive-bootstrap-4-admin-template/app-assets/css/colors.min.css">
+<link rel="stylesheet" type="text/css" href="https://pixinvent.com/stack-responsive-bootstrap-4-admin-template/app-assets/css/bootstrap.min.css">
+<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src='https://cdn.plot.ly/plotly-2.27.0.min.js'></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="text/javascript" src="https://d3js.org/d3.v3.min.js"></script>
+
+
+
+  <!-- Include ApexCharts -->
+
+<style>
+    .grey-bg {  
+        background-color: #ffffff;
+    }
+    .big-text {
+      font-size: 25px; 
+      color:#080606;/* Adjust the font size as needed */
+  }
+  .bold-uppercase {
+    font-size: 20px; 
+    color:#0e0d14;
+    font-weight: bold;
+    text-transform: uppercase;/* Adjust the font size as needed */
+  }
+
+
+html {
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.col-xl-4,
+.col-md-4 {
+  width: 33.3333%;
+  float: left;
+  padding: 15px;
+}
+.cardm {
+  background-image: linear-gradient(230deg, #759bff, #843cf6);
+  height: 130px; /* Adjust this value as needed */
+  margin-bottom: 30px;
+  border: 0px;
+  border-radius: 0.625rem;
+  box-shadow: 6px 11px 41px -28px #9b92c7;
+  color: #fff !important;
+
+
+}
+.cardn {
+  background-image: linear-gradient(230deg, #fc5286, #fbaaa2);
+  height: 130px; /* Adjust this value as needed */
+  margin-bottom: 30px;
+  border: 0px;
+  border-radius: 0.625rem;
+  box-shadow: 6px 11px 41px -28px #c79ac7;
+  color: #fff !important;
+}
+.cardk{
+  background-image: linear-gradient(230deg, #ffc480, #ff763b);
+  height: 130px; /* Adjust this value as needed */
+  margin-bottom: 30px;
+  border: 0px;
+  border-radius: 0.625rem;
+  box-shadow: 6px 11px 41px -28px #d4a359;
+  color: #fff !important;
+}
+
+</style>
+<main>
+    <div class="container-fluid">
+       
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="bold-uppercase">{{selectedTable}}</h3>
+                </div>
+                     <div class="card-body">
+                            
+                                            <section id="minimal-statistics">
+
+                                                    <div class="row">
+                                                        <div class="col-xl-4 col-sm-6 col-14"> 
+                                                          <div class="cardn">
+                                                            <div class="card-content">
+                                                              <div class="card-body">
+                                                                <div class="media d-flex">
+                                                                  <div class="align-self-center">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="white" class="bi bi-speedometer2 " viewBox="0 0 16 16">
+                                                                      <path d="M8 4a.5.5 0 0 1 .5.5V6a.5.5 0 0 1-1 0V4.5A.5.5 0 0 1 8 4zM3.732 5.732a.5.5 0 0 1 .707 0l.915.914a.5.5 0 1 1-.708.708l-.914-.915a.5.5 0 0 1 0-.707zM2 10a.5.5 0 0 1 .5-.5h1.586a.5.5 0 0 1 0 1H2.5A.5.5 0 0 1 2 10zm9.5 0a.5.5 0 0 1 .5-.5h1.5a.5.5 0 0 1 0 1H12a.5.5 0 0 1-.5-.5zm.754-4.246a.389.389 0 0 0-.527-.02L7.547 9.31a.91.91 0 1 0 1.302 1.258l3.434-4.297a.389.389 0 0 0-.029-.518z"/>
+                                                                      <path fill-rule="evenodd" d="M0 10a8 8 0 1 1 15.547 2.661c-.442 1.253-1.845 1.602-2.932 1.25C11.309 13.488 9.475 13 8 13c-1.474 0-3.31.488-4.615.911-1.087.352-2.49.003-2.932-1.25A7.988 7.988 0 0 1 0 10zm8-7a7 7 0 0 0-6.603 9.329c.203.575.923.876 1.68.63C4.397 12.533 6.358 12 8 12s3.604.532 4.923.96c.757.245 1.477-.056 1.68-.631A7 7 0 0 0 8 3z"/>
+                                                                    </svg>
+                                                                  </div>
+                                                                  <div class="media-body text-right">
+                                                                    <h3 style="font-weight: bold; font-size:15px;">{{averageKmPerDay}}</h3>
+                                                                    <span style="font-weight: bold; font-size:15px;">Average Km/day</span>
+                                                                </div>
+                                                                </div>
+                                                              </div>
+                                                            </div>
+                                                          </div>
+                                                        </div>
+                                                        <div class="col-xl-4 col-sm-6 col-14">
+                                                          <div class="cardm">
+                                                            <div class="card-content">
+                                                              <div class="card-body">
+                                                                <div class="media d-flex">
+                                                                  <div class="align-self-center">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-toggle-on text-success" viewBox="0 0 16 16">
+                                                                      <path d="M5 3a5 5 0 0 0 0 10h6a5 5 0 0 0 0-10H5zm6 9a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/>
+                                                                    </svg></div>
+                                                                  <div class="media-body text-right">
+                                                                    <h2  style="font-weight: bold; font-size:15px;">{{roundedAvgonhours}}</h2>
+                                                                    <span style="font-weight: bold; font-size:15px;">Average ON hours</span>
+                                                                  </div>
+                                                                </div>
+                                                                <div class="media d-flex">
+                                                                    <div class="align-self-center">
+                                                                      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-toggle-off text-danger" viewBox="0 0 16 16">
+                                                                        <path d="M11 4a4 4 0 0 1 0 8H8a4.992 4.992 0 0 0 2-4 4.992 4.992 0 0 0-2-4h3zm-6 8a4 4 0 1 1 0-8 4 4 0 0 1 0 8zM0 8a5 5 0 0 0 5 5h6a5 5 0 0 0 0-10H5a5 5 0 0 0-5 5z"/>
+                                                                      </svg>                                                                    </div>
+                                                                    <div class="media-body text-right">
+                                                                    <h2 style="font-weight: bold; font-size:15px;">{{roundedAvgoffhours}}</h2>
+                                                                    <span style="font-weight: bold; font-size:15px;">Average OFF hours</span>
+                              
+
+                                                                  </div>
+                                                                </div>
+                                                              </div>
+                                                            </div>
+                                                          </div>
+                                                        </div>
+                                                        <div class="col-xl-4 col-sm-6 col-14">
+                                                          <div class="cardk">
+                                                            <div class="card-content">
+                                                              <div class="card-body">
+                                                              </br>
+                                                                <div class="media d-flex">
+                                                                  <div class="align-self-center">
+                                                                      <i class="icon-power info font-large-1 float-left custom-icon-color"></i>
+                                                                  </div>
+                                                                  <div class="media-body text-right">
+                                                                    <h3  style="font-weight: bold; font-size:15px;">{{onToOffCount}}</h3>
+                                                                    <span style="font-weight: bold; font-size:15px;">Ignition On/Off count</span>
+                                                                  </div>
+                                                                </div>
+                                                              </div>
+                                                            </div>
+                                                          </div>
+                                                        </div>
+                                                  </div>
+                                                        <div class="row">
+                                                          <div class="col-2 mt-3 mb-1">
+                                                          </div>
+                                                        </div>
+                                                        <div class="row custom-padding"> <!-- Add a custom class for more specific targeting -->
+
+                                                          <div class="col-xl-5 col-md-5 ">
+                                                            <div class="card6-card">
+                                                              <div class="card6-content">
+                                                                <div class="card6-body cleartfix">
+                                                                  <div class="media align-items-stretch">
+                                                                <div class="align-self-center">
+                                                                  <p style="font-size:25px; color:rgb(97, 2, 97);">Average Battery Voltage</p>
+
+                                                      <canvas id="chart1" width="280" height="225"></canvas>
+                                                      <script>
+                                                        const speed = '{{avgvoltage}}';
+                                                        let animationAngle = 0;
+                                                        const guageNeedle = {
+                                                          id: "guageNeedle",
+                                                          afterDatasetsDraw: (chart) => {
+                                                            const {
+                                                              ctx,
+                                                              chartArea: { width }
+                                                            } = chart;
+                                                            ctx.save();
+                                                        
+                                                            const angle = (Math.PI * ((speed - 45) / 10) * chart.options.plugins.pointer.percentage) + Math.PI;
+                                                    
+                                                        
+                                                            const cx = width / 2;
+                                                            const cy = chart._metasets[0].data[0].y;
+                                                        
+                                                            ctx.translate(cx, cy);
+                                                            ctx.rotate(angle);
+                                                            ctx.beginPath();
+                                                            ctx.moveTo(0, -3);
+                                                            ctx.lineTo(cx, 0);
+                                                            ctx.lineTo(0, 3);
+                                                            ctx.fillStyle = "black";
+                                                            ctx.fill();
+                                                            ctx.rotate(-angle);
+                                                    
+                                                            ctx.translate(-cx, -cy);
+                                                            ctx.beginPath();
+                                                            ctx.arc(cx, cy, 5, 0, 10);
+                                                            ctx.fill();
+                                                            ctx.restore();
+                                                          }
+                                                        };
+                                                        const speedLabel = {
+                                                          id: "speedLabel",
+                                                          afterDatasetsDraw: (chart) => {
+                                                            const { ctx } = chart;
+                                                        
+                                                            var data = chart._metasets[0].data[0];
+                                                            var centerX = data.x;
+                                                            var centerY = data.y;
+                                                        
+                                                            ctx.fillStyle = "black";
+                                                            ctx.font = `bolder 1.5em roboto`;
+                                                            ctx.textAlign = "center";
+                                                            ctx.fillText(speed+" V", centerX, centerY + 24);
+                                                          }
+                                                        };
+                                                        
+                                                        var pointer = {
+                                                            id: 'pointer',
+                                                            defaults:{
+                                                             percentage: 0,
+                                                             maxAngle: 0
+                                                            },
+                                                            afterDraw: function(chart, args, opt) {
+                                                              const { ctx } = chart;
+                                                        
+                                                              var data = chart._metasets[0].data[0];
+                                                              var radius = data.innerRadius + (data.outerRadius - data.innerRadius) / 2;
+                                                        
+                                                              var centerX = data.x;
+                                                              var centerY = data.y;
+                                                        
+                                                              const angle = (Math.PI * ((speed - 45) / 10) * chart.options.plugins.pointer.percentage) + Math.PI;
+                                                              var x = centerX + radius * Math.cos( angle );
+                                                              var y = centerY + radius * Math.sin( angle );
+                                                        
+                                                              ctx.save();
+                                                        
+                                                              ctx.beginPath();
+                                                              ctx.lineWidth = 6;
+                                                              ctx.arc(x, y, 12, 0, 2 * Math.PI);
+                                                              ctx.stroke();
+                                                        
+                                                              ctx.restore();
+                                                            },
+                                                        }
+                                                        
+                                                        var options = {
+                                                            type: 'doughnut',
+                                                            data: {
+                                                            datasets: [{
+                                                              data: [45, 10, 0],
+                                                              backgroundColor: (context) => {
+                                                                  const { ctx, chartArea } = context.chart;
+                                                                  if (!chartArea) return;
+                                                          
+                                                                  const gradientSegment = ctx.createLinearGradient(
+                                                                    chartArea.left,
+                                                                    0,
+                                                                    chartArea.right,
+                                                                    0
+                                                                  );
+                                                                  gradientSegment.addColorStop(0, "rgb(254,1,1)");
+                                                                  gradientSegment.addColorStop(0.5, "rgb(254,205,85)");
+                                                                  gradientSegment.addColorStop(1, "rgb(144,237,144)");
+                                                          
+                                                                  return gradientSegment;
+                                                                },
+                                                             
+                                                                borderWidth: 0
+                                                            }]},
+                                                            options: {
+                                                              cutout: 80,
+                                                              rotation: -90,
+                                                              circumference: 180,
+                                                              animation:{
+                                                                onProgress: function(context){
+                                                                    if(context.initial){
+                                                                        this.options.plugins.pointer.percentage = context.currentStep / context.numSteps;
+                                                                    }
+                                                                }
+                                                              },
+                                                              responsive:false,
+                                                              
+                                                              maintainAspectRatio: false,
+                                                              legend: { display: false },
+                                                              
+                                                              plugins:{ 
+                                                                tooltip: {  enabled: false },
+                                                                pointer: {currentAngle: 1}
+                                                              }
+                                                            }, 
+                                                            plugins:[guageNeedle,speedLabel]
+                                                        }
+                                                        
+                                                        const chart = document.getElementById('chart1')
+                                                        new Chart(chart, options);
+                                                      </script>
+                                                    </div>
+                                                    
+                                                                    </div>
+                                                    
+                                                                  </div>
+                                                                </div>
+                                                              </div>
+                                                            </div>
+                                                        <div class="col-xl-5 col-md-5 ">
+                                                          <div class="card7-card">
+                                                            <div class="card7-content">
+                                                              <div class="card7-body cleartfix">
+                                                                <div class="media align-items-stretch">
+                                                              <div class="align-self-center">
+                                                                <p style="font-size:25px; color:rgb(248, 242, 242);">Acceleration counts</p>
+
+                                                              </br>
+                                                          </br>
+                                                        </br>
+                                                      </br>
+
+                                                          <ul id="speedList"></ul>
+                                                          <label for="minValue" style="font-size: 16px;">Minimum Value:</label>
+                                                          <input type="number" style="font-size: 16px;" id="minValue" step="0.01" value="5">
+                                                          <br>
+                                                          <label for="maxValue" style="font-size: 16px;">Maximum Value:</label>
+                                                          <input type="number" style="font-size: 16px;" id="maxValue" step="0.01" value="25">
+                                                          
+                                              </br>
+                                              </br>
+                                            </br>
+                                          </br>
+                                        </br>
+
+                                              <h1> Count: <span id="idCountDisplay" class="big-text"></span></h1>
+                                              
+                                              <script>
+                                              // Assuming 'data' is an array of objects
+                                              const data = {{data}}; // Replace {{data}} with your actual data
+                                              
+                                              function calculateIdCount() {
+                                                  const minValue = parseFloat(document.getElementById("minValue").value);
+                                                  const maxValue = parseFloat(document.getElementById("maxValue").value);
+                                                  const speedArray = data.map(item => item.Speed);
+                                                  const subLists = [];
+                                                  let start = 0;
+                                                  
+                                                  for (let i = 1; i < speedArray.length; i++) {
+                                                      if (speedArray[i] < speedArray[i - 1]) {
+                                                          subLists.push(speedArray.slice(start, i));
+                                                          start = i;
+                                                      }
+                                                  }
+                                                  subLists.push(speedArray.slice(start)); // Add the last sub-list
+                                                  let id_count = 0;
+                                                  let id_list = [];
+                                              
+                                                  for (const unit of subLists) {
+                                                      if (Math.min(...unit) <= minValue && Math.max(...unit) >= maxValue && new Set(unit).size > 1) {
+                                                          id_count++;
+                                                          id_list.push(unit);
+                                                      }
+                                                  }
+                                              
+                                                  // Display id_count in the HTML
+                                                  document.getElementById("idCountDisplay").textContent = id_count;
+                                              }
+                                              
+                                              // Call the function immediately after the script is executed
+                                              calculateIdCount();
+                                              
+                                              // Add event listeners to the input elements
+                                              document.getElementById("minValue").addEventListener("input", calculateIdCount);
+                                              document.getElementById("maxValue").addEventListener("input", calculateIdCount);
+                                              </script>
+                                              
+                                                              </div>
+                                                            </div>
+                                                          </div>
+                                                        </div>
+                                                      </div>
+                                                    </div>
+                                                  </div>
+
+                                                 
+                                                  <div class="row real-padding"> <!-- Add a custom class for more specific targeting -->
+                                                    <div class="col-xl-10 col-md-10" >
+                                                          <div class="custom-section-card">
+                                                            <div class="custom-section-card-content">
+                                                              <div class="custom-section-card-body cleartfix">
+                                                                <div class="media align-items-stretch">
+                                                                  <div class="align-self-center"></div>   
+                                                                  <div id="heatmap">
+                                                  
+                                                                  </div>
+                                                                   
+                                                                
+                                                                  <script>
+                                                      $(document).ready(function() {
+                                                        $('#dateTimeRange').daterangepicker({
+                                                          autoUpdateInput: true,
+                                                          timePicker: true,
+                                                          timePickerIncrement: 15,
+                                                          locale: {
+                                                            cancelLabel: 'Clear',
+                                                            format: 'MM/DD/YYYY HH:mm',
+                                                          },
+                                                          minDate: '09/01/2023', // Set the minimum date
+                                                          maxDate: moment(),    // Set the maximum date to the current date
+                                                          ranges: {
+                                                            'Last Week': [moment().startOf('week').subtract(1, 'week'), moment().startOf('week').subtract(1, 'second')],
+                                                            'This Week': [moment().startOf('week'), moment()],
+                                                            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                                                            'Today': [moment(), moment()],
+                                                            'Last Month': [moment().startOf('month').subtract(1, 'month'), moment().startOf('month').subtract(1, 'second')],
+                                                            'This Month': [moment().startOf('month'), moment()]
+                                                          }
+                                                        });
+                                                  
+                                                        $('#dateTimeRange').on('apply.daterangepicker', function(ev, picker) {
+                                                          $(this).val(picker.startDate.format('MM/DD/YYYY HH:mm') + ' - ' + picker.endDate.format('MM/DD/YYYY HH:mm'));
+                                                          const startDate = picker.startDate.toDate();
+                                                          const endDate = picker.endDate.toDate();
+                                                          renderHeatmap(startDate, endDate);
+                                                        });
+                                                  
+                                                        $('#dateTimeRange').on('cancel.daterangepicker', function() {
+                                                          $(this).val('');
+                                                          renderHeatmap(null, null);
+                                                        });
+                                                        const avgKmByDayAndHourJSON1 = '{{avgKmByDayAndHourJSON}}';
+                                                        const avgKmByDayAndHourJSON2 = JSON.parse(avgKmByDayAndHourJSON1);
+                                                        const dates3 = Object.keys(avgKmByDayAndHourJSON2);
+                                                        const z = dates3.map((date) => {
+                                                          return avgKmByDayAndHourJSON2[date].map(entry => entry.avgKm || 0);
+                                                        });
+                                                  
+                                                        const customColorScale = [
+                                                          ['0.0', 'rgb(189, 177, 180)'],
+                                                          ['0.111111111111', 'rgb(106, 215, 39)'],
+                                                          ['0.222222222222', 'rgb(7, 184, 48)'],
+                                                          ['0.333333333333', 'rgb(253,174,97)'],
+                                                          ['0.444444444444', 'rgb(254,224,144)'],
+                                                          ['0.555555555556', 'rgb(232, 122, 19)'],
+                                                          ['0.666666666667', 'rgb(214, 103, 114)'],
+                                                          ['0.777777777778', 'rgb(176, 23, 38)'],
+                                                          ['0.888888888889', 'rgb(176, 23, 38)'],
+                                                          ['1.0', 'rgb(179, 9, 26)']
+                                                        ];
+                                                  
+                                                        const data = [{
+                                                          x: Array.from({ length: 24 }, (_, i) => i), // Hours
+                                                          y: dates3, // Dates only
+                                                          z: z,
+                                                          type: 'heatmap',
+                                                          colorscale: customColorScale, // Use the custom color scale
+                                                          colorbar: {
+                                                            title: 'km',
+                                                            titleside: "right"
+                                                          }
+                                                        }];
+                                                  
+                                                        const layout3 = {
+                                                          width: 900,
+                                                          height: 500,
+                                                          xaxis: {
+                                                            title: 'Hour',
+                                                            tickmode: 'array',
+                                                            tickvals: Array.from({ length: 24 }, (_, i) => i),
+                                                            ticktext: Array.from({ length: 24 }, (_, i) => i.toString()),
+                                                          },
+                                                          yaxis: {
+                                                            tickvals: dates3,
+                                                            ticktext: dates3.map(function(date) {
+                                                              var dateObj = new Date(date);
+                                                              var weekday = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
+                                                              var dateString = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                                                              return dateString + "(" + weekday + ")";
+                                                            }),
+                                                            tickangle: -45,
+                                                            tickfont: {
+                                                              size: 8 // Adjust the font size for y-axis ticks
+                                                            }
+                                                          },
+                                                          title: 'utilization Heatmap',
+                                                          zaxis: {
+                                                            title: 'km'
+                                                          }
+                                                        };
+                                                  
+                                                        function renderHeatmap(startDate, endDate) {
+                                                          // Filter the data based on the selected date range
+                                                          const filteredDates = dates3.filter(date => {
+                                                            if (!startDate || !endDate) {
+                                                              return true; // No date range specified, so include all dates
+                                                            }
+                                                            const dateObj = new Date(date);
+                                                            return dateObj >= startDate && dateObj <= endDate;
+                                                          });
+                                                          const filteredZ = filteredDates.map(date => {
+                                                            return avgKmByDayAndHourJSON2[date].map(entry => entry.avgKm || 0);
+                                                          });
+                                                  
+                                                          // Update the heatmap data
+                                                          const newData = [{
+                                                            x: Array.from({ length: 24 }, (_, i) => i), // Hours
+                                                            y: filteredDates, // Filtered Dates
+                                                            z: filteredZ,
+                                                            type: 'heatmap',
+                                                            colorscale: customColorScale, // Use the custom color scale
+                                                            colorbar: {
+                                                              title: 'km',
+                                                              titleside: "right"
+                                                            }
+                                                          }];
+                                                  
+                                                          // Update the heatmap
+                                                          Plotly.react('heatmap', newData, layout3);
+                                                        }
+                                                  
+                                                        // Initial rendering of the heatmap with the default date range
+                                                        renderHeatmap(null, null);
+                                                      });
+                                                    </script>
+                                                                  </div>    
+                                                                </div>
+                                                              </div>
+                                                            </div>
+                                                          </div>
+                                                        </div>
+
+                                                        <div class="row custom-padding"> <!-- Add a custom class for more specific targeting -->
+                                                          <div class="col-xl-5 col-md-5 ">
+                                                              <div class="custom-second-section-card">
+                                                                <div class="custom-second-section-card-content">
+                                                                  <div class="custom-second-section-card-body cleartfix">
+                                                                    <div class="media align-items-stretch">
+                                                                      <div class="align-self-center">
+                                                                        <div id="speedGraph"><!-- Plotly chart will be drawn inside this DIV --></div>
+                                                                        <script>
+                                                                                 // Parse the JSON data passed from the server
+                                                                          const avgSpeedDataMergedJSON = '{{avgSpeedDataMergedJSON}}';
+                                                                          const avgSpeedData = JSON.parse(avgSpeedDataMergedJSON);
+                                                          
+                                                                          // Extract the dates and speeds from the JSON data
+                                                                          const dates = Object.keys(avgSpeedData);
+                                                                          const avgSpeeds = Object.values(avgSpeedData);
+                                                          
+                                                                          const trace2 = {
+                                                                            x: dates,
+                                                                            y: avgSpeeds,
+                                                                            type: 'scatter',
+                                                                            mode: 'lines+markers', // Display lines and markers
+                                                                            name: 'Avg Speed',
+                                                                            line: {
+                                                                                color: 'rgb(153, 102, 255)', // Customize the color of the line
+                                                                                shape: 'spline', // Use 'spline' for a smooth line
+                                                                                smoothing: 1.3 // Adjust the smoothing value (1.3 is a reasonable starting point)
+                                                                            },
+                                                                            marker: {
+                                                                                color: 'rgb(75, 192, 192)', // Customize the color of the markers
+                                                                                size: 7, 
+                                                                                symbol: 'circle' 
+                                                                            }
+                                                                        };
+                                                                        
+                                                                        const layout = {
+                                                                          autosize: false,
+                                                                          width: 500,
+                                                                          height: 450,
+                                                                            title: 'Average Speed ',
+                                                                            xaxis: {
+                                                                                title: 'Date',
+                                                                                showgrid: false
+                                                      
+                                                                            },
+                                                                            yaxis: {
+                                                                                title: 'Speed',
+                                                      
+                                                                            }
+                                                                        };
+                                                                        Plotly.newPlot('speedGraph', [trace2], layout);
+                                                                      </script>
+                                                                      </div>
+                                                                    </div>
+                                                                  </div>
+                                                                </div>
+                                                              </div>
+                                                            </div>
+                                                            <div class="col-xl-5 col-md-5">
+                                                              <div class="custom-second-section-card">
+                                                                <div class="custom-second-section-card-content">
+                                                                  <div class="custom-second-section-card-body cleartfix">
+                                                                    <div class="media align-items-stretch">
+                                                                      <div class="align-self-center">
+                                                      
+                                                                        <div id="myDiv"><!-- Plotly chart will be drawn inside this DIV --></div>
+                                                                        <script>
+                                                      
+                                                                          const maxSpeedDataJSON1 = '{{maxSpeedDataJSON1}}';
+                                                                          const maxSpeedData = JSON.parse(maxSpeedDataJSON1);
+                                                                          const date = Object.keys(maxSpeedData);
+                                                                          const maxSpeeds = Object.values(maxSpeedData);
+                                                      
+                                                                          var trace1 = {
+                                                                            x: date, 
+                                                                            y: maxSpeeds, 
+                                                                            type: 'bar',
+                                                                            name: 'Max Speed',
+                                                                            line:{
+                                                                              color: 'rgb(255, 99, 132)', // Customize the color of the line
+                                                                                shape: 'spline', // Use 'spline' for a smooth line
+                                                                                smoothing: 1.3
+                                                                            },
+                                                                            marker: {
+                                                                              color: 'rgb(54, 162, 235)', // Customize the color of the markers
+                                                                              size: 7, 
+                                                                              symbol: 'circle' 
+                                                                          }
+                                                                          };
+                                                                          var layout1 = {
+                                                                            autosize: false,
+                                                                            width: 450,
+                                                                            height: 450,
+                                                                            title: 'Max Speed',
+                                                                            xaxis: {
+                                                                                title: 'Date',
+                                                                                showgrid: false
+                                                      
+                                                                            },
+                                                                            yaxis: {
+                                                                                title: 'Speed'
+                                                                            },
+                                                                         
+                                                                        };
+                                                                          Plotly.newPlot('myDiv',[trace1], layout1);
+                                                                      </script>
+                                                                      </div>
+                                                                    </div>
+                                                                  </div>
+                                                                </div>
+                                                              </div>
+                                                            </div>
+
+                                                    </section>
+                     </div>
+                </div>
+              <div>
+
+          </main>
