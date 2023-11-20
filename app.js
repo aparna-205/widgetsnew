@@ -2,6 +2,8 @@ const { createPool } = require('mysql');
 const express = require('express');
 const imeiToObject = {}; // Define imeiToObject at a higher scope
 const bodyParser = require('body-parser');
+const moment = require('moment');
+const _ = require('lodash');
 const app = express();
 const port = 1000;
 const pool = createPool({
@@ -43,7 +45,6 @@ app.post('/fetch-data', (req, res) => {
             return res.status(500).json({ error: 'Error fetching table names' });
         }
         const tableNames = results.map((row) => row.TABLE_NAME);
-
 
     });
     pool.query(fetchDataQuery, [fromDateTimeObj, toDateTimeObj], (err, results) => {
@@ -107,9 +108,7 @@ for (const unit of subLists) {
                 }
                 }
             const roundedAvgonhours = avgonhours.toFixed(2);
-
             let avgoffhours = 0;
-
             for (let i=0; i<data.length - 1; i++) {
                if(data[i]['IGN'] === 'OFF' && data[i+1]['IGN'] === 'ON') {
                  const currentTime = new Date(data[i]['date_time']);
@@ -129,15 +128,93 @@ for (const unit of subLists) {
                    if (!isNaN(externalVoltage)) {
                        sumOfAverageVoltage += externalVoltage;
                        filteredDataLength++;
+
                    }
                }
            }           
            if (filteredDataLength > 0) {
                avgvoltage = (sumOfAverageVoltage / filteredDataLength).toFixed(2);
-               console.log(avgvoltage);
            }
         
             const avgKmByDate = {};
+            const timeDifferences = {};
+
+            for (let i = 1; i < data.length; i++) {
+              if (data[i].IGN === 'ON' && data[i - 1].IGN === 'ON') {
+                const startTime = moment(data[i - 1].date_time);
+                const endTime = moment(data[i].date_time);
+                const timeDifference = moment.duration(endTime.diff(startTime));
+                const formattedTimeDifference = moment.utc(timeDifference.as('milliseconds')).format('HH:mm:ss');
+            
+                const date = moment(data[i - 1].date_time).format('YYYY-MM-DD');
+            
+                if (!timeDifferences[date]) {
+                  timeDifferences[date] = moment.duration(0, 'milliseconds');
+                }
+            
+                timeDifferences[date] = timeDifferences[date].add(timeDifference);
+              }
+            }
+            
+            // Convert the accumulated durations to formatted time differences
+            const result5 = Object.entries(timeDifferences).map(([date, duration]) => ({
+              date,
+              timeDifference: moment.utc(duration.as('milliseconds')).format('HH:mm:ss'),
+            }));
+            const subtractTime = (timeDifference) => {
+              const endTimeOfDay = moment.duration('23:59:59');
+              const remainingTime = endTimeOfDay.subtract(timeDifference);
+              return moment.utc(remainingTime.as('milliseconds')).format('HH:mm:ss');
+            };
+            
+            // Iterate through the result5 array and subtract timeDifferences from '23:59:59'
+            const resultWithSubtraction = result5.map((item) => ({
+              date: item.date,
+              timeDifference: subtractTime(moment.duration(item.timeDifference)),
+            }));
+            // Assuming you already have the 'result5' array
+      
+      // Calculate the total duration
+      const totalDuration = result5.reduce((accumulator, item) => {
+        const timeParts = item.timeDifference.split(':');
+        const duration = moment.duration({
+          hours: parseInt(timeParts[0]),
+          minutes: parseInt(timeParts[1]),
+          seconds: parseInt(timeParts[2]),
+        });
+        return accumulator.add(duration);
+      }, moment.duration(0, 'milliseconds'));
+      
+      // Calculate the average duration
+      const numberOfItems = result5.length;
+      const averageDuration = moment.duration(totalDuration.as('milliseconds') / numberOfItems, 'milliseconds');
+      
+      // Format the average duration as HH:mm:ss
+      const formattedAverageDuration = moment.utc(averageDuration.as('milliseconds')).format('HH:mm:ss');
+      // Calculate the total duration for resultWithSubtraction
+ const totalDurationSubtraction = resultWithSubtraction.reduce((accumulator, item) => {
+     const timeParts = item.timeDifference.split(':');
+     const duration = moment.duration({
+       hours: parseInt(timeParts[0]),
+       minutes: parseInt(timeParts[1]),
+       seconds: parseInt(timeParts[2]),
+     });
+     return accumulator.add(duration);
+   }, moment.duration(0, 'milliseconds'));
+   
+   // Calculate the average duration for resultWithSubtraction
+   const numberOfItemsSubtraction = resultWithSubtraction.length;
+   const averageDurationSubtraction = moment.duration(totalDurationSubtraction.as('milliseconds') / numberOfItemsSubtraction, 'milliseconds');
+   
+   // Format the average duration for resultWithSubtraction as HH:mm:ss
+   const formattedAverageDurationSubtraction = moment.utc(averageDurationSubtraction.as('milliseconds')).format('HH:mm:ss');
+   
+   console.log("Average Time Difference for resultWithSubtraction: ", formattedAverageDurationSubtraction);
+   
+      
+      console.log("Average Time Difference: ", formattedAverageDuration);
+         
+
 data.forEach((row) => {
     if (row['IGN'] !== 'OM') {
         const currentDate = new Date(row['date_time']);
@@ -226,6 +303,7 @@ const avgKmByDayAndHourJSON = JSON.stringify(avgKmByDayAndHour);
           maxSpeedData1.forEach((entry) => {
             maxSpeedByDate1[entry.date] = entry.speed;
           });
+          console.log(maxSpeedData);
           
           const maxSpeedDataJSON1 = JSON.stringify(maxSpeedByDate1);
           const maxSpeedDataJSON = JSON.stringify(maxSpeedData);
@@ -280,13 +358,12 @@ const avgKmByDayAndHourJSON = JSON.stringify(avgKmByDayAndHour);
                 .replace('{{selectedTable}}', selectedTable)
                 .replace('{{avgvoltage}}', avgvoltage)
                 .replace('{{data}}',JSON.stringify(data))
-                .replace('{{roundedAvgonhours}}', roundedAvgonhours)
-                .replace('{{roundedAvgoffhours}}', roundedAvgoffhours)
+                .replace('{{formattedAverageDuration}}', formattedAverageDuration)
+                .replace('{{formattedAverageDurationSubtraction}}', formattedAverageDurationSubtraction)
                 .replace('{{fromDateTimeObj}}', fromDateTimeObj)
                 .replace('{{toDateTimeObj}}', toDateTimeObj)
                 .replace('{{averageKmPerDay}}', averageKmPerDay)
                 .replace('{{onToOffCount}}', onToOffCount)
-
                 .replace('{{maxSpeedDataJSON1}}',maxSpeedDataJSON1)
                 .replace('{{avgSpeedDataMergedJSON}}',avgSpeedDataMergedJSON)
                 .replace('{{avgKmByDayAndHourJSON}}',avgKmByDayAndHourJSON)
