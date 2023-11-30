@@ -60,8 +60,64 @@ app.post('/fetch-data', (req, res) => {
             `;
             return res.send(noDataHtml);
         }
-    
 const data = results;
+        let currentGroup = 1;
+const dataWithGroup = data.map((entry, index) => {
+  if (index > 0 && entry.IGN !== data[index - 1].IGN) {
+    currentGroup += 1;
+  }
+  return { ...entry, Group: currentGroup };
+});
+const offGroupCounts = dataWithGroup.reduce((counts, entry) => {
+  if (entry.IGN === 'OFF') {
+    counts[entry.Group] = (counts[entry.Group] || 0) + 1;
+  }
+  return counts;
+}, {});
+const filteredData = dataWithGroup.filter(
+  (entry) => entry.IGN !== 'OFF' || offGroupCounts[entry.Group] >= 3
+);
+let currentGroup1 = 1;
+const dataWithGroup1 = filteredData.map((entry, index) => {
+  if (index > 0 && entry.IGN !== filteredData[index - 1].IGN) {
+    currentGroup1 += 1;
+  }
+  return { ...entry, Group1: currentGroup1 };
+});
+const onGroups1 = dataWithGroup1.filter((item) => item.IGN === 'ON');
+onGroups1.sort((a, b) => a.Group1 - b.Group1 || new Date(a.date_time) - new Date(b.date_time));
+onGroups1.forEach((group, index, array) => {
+  if (index > 0 && group.Group1 === array[index - 1].Group1) {
+    const groupStartTime = new Date(array[index - 1].date_time);
+    const groupEndTime = new Date(group.date_time);
+    if (!isNaN(groupStartTime) && !isNaN(groupEndTime)) {
+      const timeDifferenceInSeconds = (groupEndTime - groupStartTime) / 1000;
+      group['Time Difference (s)'] = timeDifferenceInSeconds;
+    } else {
+      group['Time Difference (s)'] = 'Invalid Date';
+    }
+  }
+});
+const filteredOnGroups1 = onGroups1.filter((group) => {
+  const timeDifferenceInSeconds = group['Time Difference (s)'];
+  // Filter criteria: Time Difference greater than 1000 seconds
+  return typeof timeDifferenceInSeconds === 'number' && timeDifferenceInSeconds < 180;
+});
+const sumTimeDifferenceByGroup1 = filteredOnGroups1.reduce((acc, group) => {
+  const group1 = group.Group1;
+  const timeDifferenceInSeconds = group['Time Difference (s)'];
+  // Sum the time differences for each Group1
+  acc[group1] = (acc[group1] || 0) + timeDifferenceInSeconds;
+  return acc;
+}, {});
+const filteredSumTimeDifference = Object.fromEntries(
+    Object.entries(sumTimeDifferenceByGroup1)
+      .filter(([group, timeDifference]) => timeDifference > 60)
+  );
+  // Calculate the length of the filtered array
+  const filteredSumTimeDifferenceLength = Object.keys(filteredSumTimeDifference).length;
+  console.log(filteredSumTimeDifference);
+  console.log('Length of filteredSumTimeDifference:', filteredSumTimeDifferenceLength);
 const speedArray = data.map(item => item.Speed);
 const subLists = [];
 let start = 0;
@@ -87,10 +143,6 @@ for (const unit of subLists) {
           onToOffCount++;
             }
            }
-          
-           
-
-           
         let offToOnCount = 0;      //off to on count widget
           for (let i = 0; i < data.length - 1; i++) {
                 if (data[i]['IGN'] === 'OFF' && data[i + 1]['IGN'] === 'ON') {
@@ -128,17 +180,14 @@ for (const unit of subLists) {
                    if (!isNaN(externalVoltage)) {
                        sumOfAverageVoltage += externalVoltage;
                        filteredDataLength++;
-
                    }
                }
            }           
            if (filteredDataLength > 0) {
                avgvoltage = (sumOfAverageVoltage / filteredDataLength).toFixed(2);
            }
-        
             const avgKmByDate = {};
             const timeDifferences = {};
-
             for (let i = 1; i < data.length; i++) {
               if (data[i].IGN === 'ON' && data[i - 1].IGN === 'ON') {
                 const startTime = moment(data[i - 1].date_time);
@@ -155,7 +204,6 @@ for (const unit of subLists) {
                 timeDifferences[date] = timeDifferences[date].add(timeDifference);
               }
             }
-            
             // Convert the accumulated durations to formatted time differences
             const result5 = Object.entries(timeDifferences).map(([date, duration]) => ({
               date,
@@ -363,7 +411,7 @@ const avgKmByDayAndHourJSON = JSON.stringify(avgKmByDayAndHour);
                 .replace('{{fromDateTimeObj}}', fromDateTimeObj)
                 .replace('{{toDateTimeObj}}', toDateTimeObj)
                 .replace('{{averageKmPerDay}}', averageKmPerDay)
-                .replace('{{onToOffCount}}', onToOffCount)
+                .replace('{{filteredSumTimeDifferenceLength}}', filteredSumTimeDifferenceLength)
                 .replace('{{maxSpeedDataJSON1}}',maxSpeedDataJSON1)
                 .replace('{{avgSpeedDataMergedJSON}}',avgSpeedDataMergedJSON)
                 .replace('{{avgKmByDayAndHourJSON}}',avgKmByDayAndHourJSON)
