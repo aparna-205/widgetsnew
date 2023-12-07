@@ -40,7 +40,7 @@
 </head>
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-        <button class="btn btn-link btn-sm order-1 order-lg-0" id="sidebarToggle" href="#"><i class="fas fa-bars"></i></button>
+        <button class="btn btn-link btn-sm order-1 order-lg-0" id="sidebarToggle" href="#"><i class="fas fa-bars" style="color: #fafafc;"></i></button>
         <script>
             $(document).ready(function() {
                 "use strict";
@@ -71,6 +71,8 @@
 
                         <form  id="fetchForm" action="/fetch-data" method="post" class="table-container">
                             <input type="text" id="dateTimeRange" name="dateTimeRange" />
+                            <input type="text1" id="mySearch" onkeyup="myFunction()" placeholder="Search...." title="Type in a category" >
+                            
                             <div class="table-scroll">
 
                         <!-- Wrap the table in a div with a scrollbar -->
@@ -83,6 +85,23 @@
                             </div>
                         <input type="submit" value="Fetch Data">
                     </form>
+                    <script>
+                        function myFunction() {
+                          var input, filter, tbody, td, tr, i;
+                          input = document.getElementById("mySearch");
+                          filter = input.value.toUpperCase();
+                          ul = document.getElementById("tableList");
+                          li = ul.getElementsByTagName("tr");
+                          for (i = 0; i < li.length; i++) {
+                            a = li[i].getElementsByTagName("td")[0];
+                            if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                              li[i].style.display = "";
+                            } else {
+                              li[i].style.display = "none";
+                            }
+                          }
+                        }
+                        </script>
                     <script>
                         // Fetch tableNames from your server-side route (e.g., using AJAX)
                         // and insert them into the <tbody> element as an HTML table
