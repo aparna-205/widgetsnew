@@ -28,7 +28,6 @@ app.get('/getTableNames', (req, res) => {
         res.json({ tableNames });
     });
 });
-
 app.post('/fetch-data', (req, res) => {
     const selectedTable = req.body.table;
     const dateTimeRange = req.body.dateTimeRange;
@@ -61,7 +60,13 @@ app.post('/fetch-data', (req, res) => {
             return res.send(noDataHtml);
         }
 const data = results;
-        let currentGroup = 1;
+const formattedDataArray = data.map(item => {
+  return {
+    ...item,
+    date_time: item.date_time.toLocaleString() // Convert to a human-readable format
+  };
+});
+let currentGroup = 1;
 const dataWithGroup = data.map((entry, index) => {
   if (index > 0 && entry.IGN !== data[index - 1].IGN) {
     currentGroup += 1;
@@ -74,12 +79,12 @@ const offGroupCounts = dataWithGroup.reduce((counts, entry) => {
   }
   return counts;
 }, {});
-const filteredData = dataWithGroup.filter(
+const filteredData1 = dataWithGroup.filter(
   (entry) => entry.IGN !== 'OFF' || offGroupCounts[entry.Group] >= 3
 );
 let currentGroup1 = 1;
-const dataWithGroup1 = filteredData.map((entry, index) => {
-  if (index > 0 && entry.IGN !== filteredData[index - 1].IGN) {
+const dataWithGroup1 = filteredData1.map((entry, index) => {
+  if (index > 0 && entry.IGN !== filteredData1[index - 1].IGN) {
     currentGroup1 += 1;
   }
   return { ...entry, Group1: currentGroup1 };
@@ -116,8 +121,7 @@ const filteredSumTimeDifference = Object.fromEntries(
   );
   // Calculate the length of the filtered array
   const filteredSumTimeDifferenceLength = Object.keys(filteredSumTimeDifference).length;
-  console.log(filteredSumTimeDifference);
-  console.log('Length of filteredSumTimeDifference:', filteredSumTimeDifferenceLength);
+
 const speedArray = data.map(item => item.Speed);
 const subLists = [];
 let start = 0;
@@ -136,19 +140,12 @@ for (const unit of subLists) {
         id_list.push(unit);
     }
 }
+
+
+
+
         let totalDistance = 0;
-        let onToOffCount = 0;
-         for (let i = 0; i < data.length - 1; i++) {
-               if (data[i]['IGN'] === 'ON' && data[i + 1]['IGN'] === 'OFF') {
-          onToOffCount++;
-            }
-           }
-        let offToOnCount = 0;      //off to on count widget
-          for (let i = 0; i < data.length - 1; i++) {
-                if (data[i]['IGN'] === 'OFF' && data[i + 1]['IGN'] === 'ON') {
-            offToOnCount++;
-            }
-           }
+       
            let avgonhours = 0;                      // avg onhours widget
            for (let i = 0; i < data.length - 1; i++) {
              if (data[i]['IGN'] === 'ON' && data[i + 1]['IGN'] === 'OFF') {
@@ -180,14 +177,19 @@ for (const unit of subLists) {
                    if (!isNaN(externalVoltage)) {
                        sumOfAverageVoltage += externalVoltage;
                        filteredDataLength++;
+
                    }
                }
            }           
            if (filteredDataLength > 0) {
                avgvoltage = (sumOfAverageVoltage / filteredDataLength).toFixed(2);
            }
+
+          
+        
             const avgKmByDate = {};
             const timeDifferences = {};
+
             for (let i = 1; i < data.length; i++) {
               if (data[i].IGN === 'ON' && data[i - 1].IGN === 'ON') {
                 const startTime = moment(data[i - 1].date_time);
@@ -204,6 +206,7 @@ for (const unit of subLists) {
                 timeDifferences[date] = timeDifferences[date].add(timeDifference);
               }
             }
+            
             // Convert the accumulated durations to formatted time differences
             const result5 = Object.entries(timeDifferences).map(([date, duration]) => ({
               date,
@@ -256,13 +259,6 @@ for (const unit of subLists) {
    
    // Format the average duration for resultWithSubtraction as HH:mm:ss
    const formattedAverageDurationSubtraction = moment.utc(averageDurationSubtraction.as('milliseconds')).format('HH:mm:ss');
-   
-   console.log("Average Time Difference for resultWithSubtraction: ", formattedAverageDurationSubtraction);
-   
-      
-      console.log("Average Time Difference: ", formattedAverageDuration);
-         
-
 data.forEach((row) => {
     if (row['IGN'] !== 'OM') {
         const currentDate = new Date(row['date_time']);
@@ -351,7 +347,6 @@ const avgKmByDayAndHourJSON = JSON.stringify(avgKmByDayAndHour);
           maxSpeedData1.forEach((entry) => {
             maxSpeedByDate1[entry.date] = entry.speed;
           });
-          console.log(maxSpeedData);
           
           const maxSpeedDataJSON1 = JSON.stringify(maxSpeedByDate1);
           const maxSpeedDataJSON = JSON.stringify(maxSpeedData);
@@ -396,6 +391,135 @@ const avgKmByDayAndHourJSON = JSON.stringify(avgKmByDayAndHour);
         avgSpeedDataObject[entry.date] = parseFloat(entry.averageSpeed);
         });
         const avgSpeedDataMergedJSON = JSON.stringify(avgSpeedDataObject);
+        const filteredData = formattedDataArray.filter(item => parseFloat(item['External Voltage']) > 40);
+const dateTimes = filteredData.map(entry => entry.date_time);
+
+
+const distance = filteredData.map(entry => entry['Last Distance (meters)']);
+const externalVoltages = filteredData.map(entry => entry['External Voltage']);
+const integerList = externalVoltages.map(parseFloat);
+
+const combinedData = dateTimes.map((dateTime, index) => ({
+  dateTime,
+  integerValue: integerList[index],
+  Distance: distance[index]
+}));
+function calculateSMA(combinedData, windowSize) {
+  const smoothedData = [];
+  for (let i = 0; i < combinedData.length; i++) {
+    const start = Math.max(0, i - Math.floor(windowSize / 2));
+    const end = Math.min(combinedData.length - 1, i + Math.ceil(windowSize / 2));
+
+    const sum = combinedData.slice(start, end + 1)
+      .reduce((acc, entry) => acc + entry.integerValue, 0);
+    
+    const average = sum / (end - start + 1);
+
+    smoothedData.push(average);
+  }
+  return smoothedData;
+}
+const windowSize = 20; 
+const smoothedCurve = calculateSMA(combinedData, windowSize);
+
+const combinedSmoothedData = dateTimes.map((dateTime, index) => ({
+  dateTime,
+  distancevalue:distance[index],
+  smoothedValue: smoothedCurve[index]
+}));
+
+  function argrelextrema(values, comparator, order) {
+    const extremaIndices = [];
+    for (let i = order; i < values.length - order; i++) {
+      const subArray = values.slice(i - order, i + order + 1);
+      const isExtrema = subArray.every((value, index) => comparator(value, subArray[order]) || index === order);
+
+      if (isExtrema) {
+        extremaIndices.push(i);
+      }
+    }
+  
+    return extremaIndices;
+  }
+  function argrelminima(values, comparator, order) {
+    const minimaIndices = [];
+    for (let i = order; i < values.length - order; i++) {
+      const subArray = values.slice(i - order, i + order + 1);
+      const isMinima = subArray.every((value, index) => comparator(value, subArray[order]) || index === order);
+      if (isMinima) {
+        minimaIndices.push(i);
+      }
+    }
+  
+    return minimaIndices;
+  }
+  const minimaIndices = argrelminima(
+    combinedSmoothedData.map(entry => entry.smoothedValue),
+    (a, b) => a >b,
+    350
+  );
+  const maximaIndices = argrelextrema(
+    combinedSmoothedData.map(entry => entry.smoothedValue),
+    (a, b) => a <=b,
+    350
+  );
+  const maximaData = maximaIndices.map(index => combinedSmoothedData[index].smoothedValue);
+  const minimaData = minimaIndices.map(index => combinedSmoothedData[index].smoothedValue);
+  
+  const correspondingdates = [...new Set(maximaIndices.map(index => combinedSmoothedData[0].dateTime))];
+  const indicesOfDates = correspondingdates.map(date => combinedSmoothedData.findIndex(entry => entry.dateTime === date));
+  const zerothindex = indicesOfDates.concat(maximaIndices);
+  const correspondingData = [...new Set(zerothindex.map(index => combinedSmoothedData[index]))];
+  const correspondingData1 = minimaIndices.map(index => combinedSmoothedData[index]);
+  
+  const interleavedData = [];
+  
+  const maxLength = Math.max(correspondingData.length, correspondingData1.length);
+  
+  for (let i = 0; i < maxLength; i++) {
+    if (i < correspondingData.length) {
+      interleavedData.push(correspondingData[i]);
+    }
+    if (i < correspondingData1.length) {
+      interleavedData.push(correspondingData1[i]);
+    }
+  }
+  
+  const result = [];
+
+// Check if both arrays have the same length
+if (interleavedData.length !== combinedSmoothedData.length) {
+  const length = interleavedData.length;
+
+  // Iterate over interleavedData in steps of 2
+  for (let i = 0; i < length - 1; i += 2) {
+    const startData = interleavedData[i];
+    const endData = interleavedData[i + 1];
+
+    // Perform your calculation using combinedSmoothedData or other data
+    // Modify this part according to your specific calculation
+    const startIndex = combinedSmoothedData.findIndex(entry => entry.dateTime === startData.dateTime);
+    const endIndex = combinedSmoothedData.findIndex(entry => entry.dateTime === endData.dateTime);
+
+    const filteredData = combinedSmoothedData.slice(startIndex, endIndex + 1);
+    const sumDistance = filteredData.reduce((sum, entry) => sum + parseInt(entry['distancevalue']), 0);
+    const multipliedSumDistance = (sumDistance * 0.001).toFixed(2);
+
+    result.push({
+      start_date_time: startData.dateTime,
+      end_date_time: endData.dateTime,
+      start_voltage:startData.smoothedValue,
+      end_voltage:endData.smoothedValue,
+      sum_distance: multipliedSumDistance
+    });
+  }
+
+} else {
+  console.error('Arrays do not have the same length.');
+}
+console.log(result);
+console.log(maxSpeedDataJSON1);
+
         const htmlTemplatePath = path.join(__dirname, 'public', 'result.html');
         fs.readFile(htmlTemplatePath, 'utf8', (err, template) => {
             if (err) {
@@ -405,6 +529,8 @@ const avgKmByDayAndHourJSON = JSON.stringify(avgKmByDayAndHour);
                 const renderedHtml = template
                 .replace('{{selectedTable}}', selectedTable)
                 .replace('{{avgvoltage}}', avgvoltage)
+                .replace('{{result}}',JSON.stringify(result))
+
                 .replace('{{data}}',JSON.stringify(data))
                 .replace('{{formattedAverageDuration}}', formattedAverageDuration)
                 .replace('{{formattedAverageDurationSubtraction}}', formattedAverageDurationSubtraction)
@@ -412,6 +538,7 @@ const avgKmByDayAndHourJSON = JSON.stringify(avgKmByDayAndHour);
                 .replace('{{toDateTimeObj}}', toDateTimeObj)
                 .replace('{{averageKmPerDay}}', averageKmPerDay)
                 .replace('{{filteredSumTimeDifferenceLength}}', filteredSumTimeDifferenceLength)
+
                 .replace('{{maxSpeedDataJSON1}}',maxSpeedDataJSON1)
                 .replace('{{avgSpeedDataMergedJSON}}',avgSpeedDataMergedJSON)
                 .replace('{{avgKmByDayAndHourJSON}}',avgKmByDayAndHourJSON)
