@@ -57,13 +57,13 @@ html {
   padding-left: 14rem !important; /* Use !important to override conflicting styles */
 }
 .real-padding {
-  padding-left: 16rem !important; /* Use !important to override conflicting styles */
+  padding-left: 15rem !important; /* Use !important to override conflicting styles */
 }
 article, aside, figcaption, figure, footer, header, hgroup, main, nav, section {
   display: block;
 }
 .custom-section-card {
-  max-width: 1400px; /* Adjust as needed */
+  max-width: 1600px; /* Adjust as needed */
   padding: 15px;
   font-size: 1.5em;
 }
@@ -101,6 +101,12 @@ input[type="submit"] {
   background-color:  #ff8000;
   color: white;
   }
+  input[type="text1"] {
+    width: 340px; 
+    height:32px;
+    background-color:  #ffff;
+    color: rgb(12, 11, 11);
+    }
   .table-scroll {
     max-height: 800px; /* Adjust the max height as needed */
     overflow-y: auto; /* Enable vertical scrollbar */
@@ -4487,6 +4493,7 @@ input[type=button].btn-block {
   border-radius: 5px;
   overflow: hidden;
   display: flex;
+  
   flex-direction: column; /* Align children in a column */
   align-items: center; /* Center children horizontally */
   justify-content: center; /* Center children vertically */
@@ -4528,7 +4535,8 @@ input[type=button].btn-block {
 .card-header {
   padding: 0.75rem 1.25rem;
   margin-bottom: 0;
-  background-color: rgba(0, 0, 0, 0.03);
+  background-image: linear-gradient(230deg, #131339,#ffff);
+
   border-bottom: 1px solid rgba(0, 0, 0, 0.125);
 }
 .card-header:first-child {
@@ -6132,6 +6140,7 @@ a.close.disabled {
   color: #fff;
   text-align: center;
 }
+
 
 @-webkit-keyframes spinner-border {
   to {
@@ -10284,7 +10293,7 @@ body {
   color: rgba(255, 255, 255, 0.5);
 }
 .sb-topnav.navbar-light #sidebarToggle {
-  color: #212529;
+  color: #ffff;
 }
 
 .sb-sidenav {
