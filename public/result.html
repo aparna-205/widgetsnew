@@ -152,7 +152,7 @@ body {
                                                                       <i class="icon-power info font-large-1 float-left custom-icon-color"></i>
                                                                   </div>
                                                                   <div class="media-body text-right">
-                                                                    <h3 class="warning">{{filteredSumTimeDifferenceLength}}</h3>
+                                                                    <h2 style="font-weight: bold; font-size:15px;">{{filteredSumTimeDifferenceLength}}</h2>
                                                                     <span style="font-weight: bold; font-size:15px;">Ignition On/Off count</span>
                                                                   </div>
                                                                 </div>
@@ -659,85 +659,65 @@ body {
                                                                         <div class="custom-section-card-body cleartfix">
                                                                           <div class="media align-items-stretch">
                                                                             <div class="align-self-center"></div>   
-                                                                            <div id="graph">
-                                                            
-                                                                            </div>
+                                                                            <div id="lineChart"></div>
                                                                             <script>
-                                                                              var result= {{result}};
-                                                                              const xValues = result.map(entry => entry.start_date_time);
-                                                                              const baseValues = result.map(entry => entry.end_voltage);
-    const yValues = result.map(entry => entry.start_voltage - entry.end_voltage);
-                                                                      
-                                                                              const textValues = result.map(entry => entry.sum_distance);
-                                                                      
-                                                                              // Create the Plotly.js graph
-                                                                              Plotly.newPlot('graph', [{
-                                                                                type: 'bar',
-                                                                                x: xValues,
-                                                                                base: baseValues,
-                                                                                y: yValues,
-                                                                                text: textValues,
-                                                                                offset: 0,
-                                                                                textposition: 'inside',
-                                                                                insidetextanchor: 'middle',
-                                                                                textfont: {
-                                                                                    color: 'rgba(204,204,204,1)'
-                                                                                },
-                                                                                marker: {
-                                                                                    color: 'rgba(222,45,38,0.8)',
-                                                                                    width: 0.5
-                                                                                }
-                                                                            }], {
-                                                                                width: 1000, // Set the width of the graph
-                                                                                height: 500, // Set the height of the graph
-                                                                                xaxis: {
-                                                                                    title: ' Date and Time',
-                                                                                    tickmode: 'auto',
-                                                                                    dtick: 1,
-                                                                                    tickfont: {
-                                                                                        size: 7
-                                                                                    }
-                                                                                },
-                                                                                yaxis: {
-                                                                                    title: 'Battery Voltage'
-                                                                                },
-                                                                                title: 'Battery Voltage and Range',
-                                                                                shapes: [
-                                                                                    {
-                                                                                        type: 'line',
-                                                                                        xref: 'paper', // reference to the x-axis in paper coordinates
-                                                                                        x0: 0,
-                                                                                        x1: 1,
-                                                                                        yref: 'y',
-                                                                                        y0: 41,
-                                                                                        y1: 41,
-                                                                                        line: {
-                                                                                            color: 'green',
-                                                                                            width: 2,
-                                                                                            dash: 'dash'
-                                                                                        }
-                                                                                    },
-                                                                                    {
-                                                                                        type: 'line',
-                                                                                        xref: 'paper',
-                                                                                        x0: 0,
-                                                                                        x1: 1,
-                                                                                        yref: 'y',
-                                                                                        y0: 54.6,
-                                                                                        y1: 54.6,
-                                                                                        line: {
-                                                                                            color: 'green',
-                                                                                            width: 2,
-                                                                                            dash: 'dash'
-                                                                                        }
-                                                                                    }
-                                                                                ]
-                                                                            });
-                                                                            
-                                                                      
-                                                                      
-                                                                      
-                                                                            </script>
+                                                                              const voltageCurveJson = {{voltagecurve}};
+                                                                              const distancecurveJson = {{distancecurve}};
+                                                                          
+                                                                              // Primary Y-axis data
+                                                                              const xData = voltageCurveJson.map(entry => entry.concatenatedDate);
+                                                                              const yData = voltageCurveJson.map(entry => entry.voltagedata
+                                                                              );
+                                                                          
+                                                                              // Secondary Y-axis data
+                                                                              const x2 = distancecurveJson.map(entry => entry.concatenatedDateTime);
+                                                                              const y2 = distancecurveJson.map(entry => entry.Distance);
+                                                                          
+                                                                              // Create line traces for primary and secondary axes
+                                                                              const trace1 = {
+                                                                                  x: xData,
+                                                                                  y: yData,
+                                                                                  type: 'line',
+                                                                                  name: 'Voltage',
+                                                                                  marker: {
+                                                                                      color: 'green',
+                                                                                  },
+                                                                              };
+                                                                          
+                                                                              const trace3 = {
+                                                                                  x: x2,
+                                                                                  y: y2,
+                                                                                  type: 'bar',
+                                                                                  name: 'Distance',
+                                                                                  yaxis: 'y2',  // Associate with the secondary y-axis
+                                                                                  marker: {
+                                                                                      color: 'blue',
+                                                                                  },
+                                                                              };
+                                                                          
+                                                                              const layout8 = {
+                                                                                  title: ' Battery Voltage and Range',
+                                                                                  width: 1050,
+                                                                                  height: 450,
+                                                                                  xaxis: {
+                                                                                      title: 'Time ',
+                                                                                  },
+                                                                                  yaxis: {
+                                                                                      title: 'Voltage',
+
+                                                                                  },
+                                                                                  yaxis2: {
+                                                                                      title: 'Distance',
+                                                                                      overlaying: 'y',
+                                                                                      side: 'right',
+                                                                                      range: [0, 50],
+
+                                                                                  },
+                                                                              };
+                                                                          
+                                                                              Plotly.newPlot('lineChart', [trace1, trace3], layout8);
+                                                                          </script>
+                                                                          
                                                                           </div>    
                                                                         </div>
                                                                       </div>
