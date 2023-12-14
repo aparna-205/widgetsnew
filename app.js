@@ -140,12 +140,7 @@ for (const unit of subLists) {
         id_list.push(unit);
     }
 }
-
-
-
-
         let totalDistance = 0;
-       
            let avgonhours = 0;                      // avg onhours widget
            for (let i = 0; i < data.length - 1; i++) {
              if (data[i]['IGN'] === 'ON' && data[i + 1]['IGN'] === 'OFF') {
@@ -256,15 +251,11 @@ for (const unit of subLists) {
    // Calculate the average duration for resultWithSubtraction
    const numberOfItemsSubtraction = resultWithSubtraction.length;
    const averageDurationSubtraction = moment.duration(totalDurationSubtraction.as('milliseconds') / numberOfItemsSubtraction, 'milliseconds');
-   
-   // Format the average duration for resultWithSubtraction as HH:mm:ss
    const formattedAverageDurationSubtraction = moment.utc(averageDurationSubtraction.as('milliseconds')).format('HH:mm:ss');
 data.forEach((row) => {
     if (row['IGN'] !== 'OM') {
         const currentDate = new Date(row['date_time']);
         const currentavgkm = row['Last Distance (meters)'];
-
-        // Check if the value is zero or not 'NA', and exclude it
         if (currentavgkm !== 'NA' && parseFloat(currentavgkm) !== 0) {
             const formattedDate = currentDate.toISOString().split('T')[0];
             if (!avgKmByDate[formattedDate]) {
@@ -283,31 +274,70 @@ const avgKmData = Object.keys(avgKmByDate).map((date) => {
         averageKm,
     };
 });
-const groupedData = {};
 
+const resultObject = {};
+const mainObject   ={};
+data.forEach((row) => {
+  if (row['IGN']==="ON" & row['External Voltage'] > 40) {
+    const currentDate = new Date(row['date_time']);
+    const formattedDate = currentDate.toISOString().split('T')[0];
+    const hour = currentDate.getHours();
+    const currentTime = new Date();
+    const options = { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' };
+    const time24hr = currentDate.toLocaleTimeString('en-US', options);
+     
+    const Distance = row['Last Distance (meters)']*0.001;
+    const concatenatedDateTime = formattedDate + ' ' + hour;
+    const concatenatedDate= formattedDate + ' ' + time24hr;
+ 
+    const voltagedata = row['External Voltage'];
+    if (!resultObject[concatenatedDateTime]) {
+      resultObject[concatenatedDateTime] = Distance;
+    } else {
+      resultObject[concatenatedDateTime] += Distance;
+    }
+
+    if (!mainObject[concatenatedDate]){
+      mainObject[concatenatedDate] = voltagedata;
+    }
+  }
+});
+const resultArray = Object.entries(resultObject).map(([concatenatedDateTime, Distance]) => ({
+  concatenatedDateTime,
+  Distance: parseFloat(Distance.toFixed(2)),
+}));
+const resultArray1 = Object.entries(mainObject).map(([concatenatedDate, voltagedata]) => ({
+  concatenatedDate,
+  voltagedata
+}));
+
+
+const distancecurve = JSON.stringify(resultArray);
+const voltagecurve =JSON.stringify(resultArray1);
+const groupedData = {};
 data.forEach((row) => {
     if (row['IGN'] !== 'OM') {
         const currentDate = new Date(row['date_time']);
         const formattedDate = currentDate.toISOString().split('T')[0];
         const dayOfWeek = currentDate.getDay(); // 0 (Sunday) to 6 (Saturday)
         const hour = currentDate.getHours();
+
+
+
         if (!groupedData[formattedDate]) {
             groupedData[formattedDate] = {};
         }
 
         if (!groupedData[formattedDate][hour]) {
             groupedData[formattedDate][hour] = {
-                totalKm: 0, // Initialize as a numeric value
-                count: 0,
+                totalKm: 0, 
             };
         }
         // Parse 'Last Distance (meters)' as a float or integer, assuming it's a string
         const distance = parseFloat(row['Last Distance (meters)']);
         groupedData[formattedDate][hour].totalKm += distance;
-        groupedData[formattedDate][hour].count++;
     }
 });
-
 // Calculate the average kilometers for each day and hour
 const avgKmByDayAndHour = {};
 
@@ -350,6 +380,8 @@ const avgKmByDayAndHourJSON = JSON.stringify(avgKmByDayAndHour);
           
           const maxSpeedDataJSON1 = JSON.stringify(maxSpeedByDate1);
           const maxSpeedDataJSON = JSON.stringify(maxSpeedData);
+
+
           const avgSpeedByDate = {};
 
           data.forEach((row) => {
@@ -391,9 +423,9 @@ const avgKmByDayAndHourJSON = JSON.stringify(avgKmByDayAndHour);
         avgSpeedDataObject[entry.date] = parseFloat(entry.averageSpeed);
         });
         const avgSpeedDataMergedJSON = JSON.stringify(avgSpeedDataObject);
-        const filteredData = formattedDataArray.filter(item => parseFloat(item['External Voltage']) > 40);
-const dateTimes = filteredData.map(entry => entry.date_time);
+        const filteredData = formattedDataArray.filter(item => parseFloat(item['External Voltage']) > 40);  
 
+const dateTimes = filteredData.map(entry => entry.date_time);
 
 const distance = filteredData.map(entry => entry['Last Distance (meters)']);
 const externalVoltages = filteredData.map(entry => entry['External Voltage']);
@@ -517,8 +549,7 @@ if (interleavedData.length !== combinedSmoothedData.length) {
 } else {
   console.error('Arrays do not have the same length.');
 }
-console.log(result);
-console.log(maxSpeedDataJSON1);
+
 
         const htmlTemplatePath = path.join(__dirname, 'public', 'result.html');
         fs.readFile(htmlTemplatePath, 'utf8', (err, template) => {
@@ -529,8 +560,9 @@ console.log(maxSpeedDataJSON1);
                 const renderedHtml = template
                 .replace('{{selectedTable}}', selectedTable)
                 .replace('{{avgvoltage}}', avgvoltage)
+                .replace('{{distancecurve}}', distancecurve)
+                .replace('{{voltagecurve}}', voltagecurve)
                 .replace('{{result}}',JSON.stringify(result))
-
                 .replace('{{data}}',JSON.stringify(data))
                 .replace('{{formattedAverageDuration}}', formattedAverageDuration)
                 .replace('{{formattedAverageDurationSubtraction}}', formattedAverageDurationSubtraction)
@@ -538,7 +570,6 @@ console.log(maxSpeedDataJSON1);
                 .replace('{{toDateTimeObj}}', toDateTimeObj)
                 .replace('{{averageKmPerDay}}', averageKmPerDay)
                 .replace('{{filteredSumTimeDifferenceLength}}', filteredSumTimeDifferenceLength)
-
                 .replace('{{maxSpeedDataJSON1}}',maxSpeedDataJSON1)
                 .replace('{{avgSpeedDataMergedJSON}}',avgSpeedDataMergedJSON)
                 .replace('{{avgKmByDayAndHourJSON}}',avgKmByDayAndHourJSON)
