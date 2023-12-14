@@ -59,6 +59,7 @@ html {
 .real-padding {
   padding-left: 15rem !important; /* Use !important to override conflicting styles */
 }
+
 article, aside, figcaption, figure, footer, header, hgroup, main, nav, section {
   display: block;
 }
@@ -90,33 +91,29 @@ table {
   color: #fa0808!important;
 }
 input[type="submit"] {
-  width: 340px; 
+  width: 370px; 
   height:35px;
   background-color: #ff8000;
   color: white;
   }
   input[type="text"] {
-  width: 340px; 
+  width: 370px; 
   height:35px;
   background-color:  #ff8000;
   color: white;
   }
   input[type="text1"] {
-    width: 340px; 
+    width: 370px; 
     height:32px;
     background-color:  #ffff;
     color: rgb(12, 11, 11);
     }
   .table-scroll {
-    max-height: 800px; /* Adjust the max height as needed */
+    max-height: 700px; /* Adjust the max height as needed */
     overflow-y: auto; /* Enable vertical scrollbar */
 }
 
-  tr:nth-child(even){background-color: #ebeaec;}
-  tr:hover {background-color: #ddd;}
-[tabindex="-1"]:focus:not(:focus-visible) {
-  outline: 0 !important;
-}
+  
 
 hr {
   box-sizing: content-box;
@@ -1786,6 +1783,10 @@ pre code {
 .table-primary thead th,
 .table-primary tbody + tbody {
   border-color: #7abaff;
+}
+.custom-table {
+  width: 350px;
+  /* Add any other styles you need */
 }
 
 .table-hover .table-primary:hover {
@@ -10184,11 +10185,11 @@ body {
   display: flex;
 }
 #layoutSidenav #layoutSidenav_nav {
-  flex-basis: 340px;
+  flex-basis: 370px;
   flex-shrink: 0;
   transition: transform 0.15s ease-in-out;
   z-index: 1038;
-  transform: translateX(-340px);
+  transform: translateX(-370px);
 }
 #layoutSidenav #layoutSidenav_content {
   position: relative;
@@ -10198,7 +10199,7 @@ body {
   min-width: 0;
   flex-grow: 1;
   min-height: calc(100vh - 56px);
-  margin-left: -340px;
+  margin-left: -370px;
 }
 
 .sb-sidenav-toggled #layoutSidenav #layoutSidenav_nav {
@@ -10228,10 +10229,10 @@ body {
   }
 
   .sb-sidenav-toggled #layoutSidenav #layoutSidenav_nav {
-    transform: translateX(-340px);
+    transform: translateX(-370px);
   }
   .sb-sidenav-toggled #layoutSidenav #layoutSidenav_content {
-    margin-left: -340px;
+    margin-left: -370px;
   }
   .sb-sidenav-toggled #layoutSidenav #layoutSidenav_content:before {
     display: none;
@@ -10241,7 +10242,7 @@ body {
   z-index: 1039;
 }
 .sb-nav-fixed #layoutSidenav #layoutSidenav_nav {
-  width: 340px;
+  width: 370px;
   height: 102vh;
   z-index: 1038;
 }
@@ -10252,7 +10253,7 @@ body {
   overflow-y: auto;
 }
 .sb-nav-fixed #layoutSidenav #layoutSidenav_content {
-  padding-left: 340px;
+  padding-left: 370px;
   top: 56px;
 }
 
