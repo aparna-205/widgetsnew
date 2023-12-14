@@ -36,6 +36,26 @@
         <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+        <style>
+            
+            
+            th {
+                padding: 5px;
+                text-align: left;
+                background-color: #ff8000;
+                color: white;
+            }
+            
+            td {
+                padding: 5px;
+                border: 1px solid #807c7c;
+            }
+
+            .selected {
+                background-color: #ff8000; /* You can adjust the background color as needed */
+            }
+            
+        </style>
     {% block title%}{% endblock %}
 </head>
 <body class="sb-nav-fixed">
@@ -72,17 +92,15 @@
                         <form  id="fetchForm" action="/fetch-data" method="post" class="table-container">
                             <input type="text" id="dateTimeRange" name="dateTimeRange" />
                             <input type="text1" id="mySearch" onkeyup="myFunction()" placeholder="Search...." title="Type in a category" >
-                            
                             <div class="table-scroll">
-
-                        <!-- Wrap the table in a div with a scrollbar -->
-                            <table>
-                                <thead>
+                        <table class="custom-table">
+                            <thead>
                                 </thead>
                                 <tbody id="tableList">
                                 </tbody>
                             </table>
                             </div>
+
                         <input type="submit" value="Fetch Data">
                     </form>
                     <script>
@@ -102,42 +120,63 @@
                           }
                         }
                         </script>
-                    <script>
-                        // Fetch tableNames from your server-side route (e.g., using AJAX)
-                        // and insert them into the <tbody> element as an HTML table
-                        fetch('/getTableNames')
-                            .then(response => response.json())
-                            .then(data => {
-                                const tableList = document.getElementById('tableList');
-                                data.tableNames.forEach(tableName => {
-                                    const row = document.createElement('tr');
-                                    const cell1 = document.createElement('td');
-                                    const cell2 = document.createElement('td');
-                                    const radio = document.createElement('input');
-                                    radio.type = 'radio';
-                                    radio.name = 'table';
-                                    radio.value = tableName; // Set the IMEI number as the value for selection
-                                    
-                                    // Display the object name
-                                    if (typeof imeiToObject !== 'undefined' && imeiToObject[tableName]) {
-                                        cell1.textContent = imeiToObject[tableName]; // Display the object name
-                                    } else {
-                                        cell1.textContent = tableName; // Display the table name
-                                    }
-                                    cell2.appendChild(radio);
-                                    row.appendChild(cell1);
-                                    row.appendChild(cell2);
-                                    tableList.appendChild(row);
-                                });
-                            })
-                            .catch(error => console.error(error));
-                    </script>
+                        <script>
+                            // Fetch tableNames from your server-side route (e.g., using AJAX)
+                            // and insert them into the <tbody> element as an HTML table
+                            fetch('/getTableNames')
+                                .then(response => response.json())
+                                .then(data => {
+                                    const tableList = document.getElementById('tableList');
+                                    let selectedRow = null;
+                        
+                                    data.tableNames.forEach(tableName => {
+                                        const row = document.createElement('tr');
+                                        const cell1 = document.createElement('td');
+                                        const cell2 = document.createElement('td');
+                                        const radio = document.createElement('input');
+                                        radio.type = 'radio';
+                                        radio.name = 'table';
+                                        radio.value = tableName; // Set the IMEI number as the value for selection
+                        
+                                        if (typeof imeiToObject !== 'undefined' && imeiToObject[tableName]) {
+                                            cell1.textContent = imeiToObject[tableName]; // Display the object name
+                                        } else {
+                                            cell1.textContent = tableName; // Display the table name
+                                        }
+                                        cell2.appendChild(radio);
+                                        row.appendChild(cell1);
+                                        row.appendChild(cell2);
+                                        tableList.appendChild(row);
+                        
+                                        // Add event listener to the radio button for highlighting
+                                        radio.addEventListener('change', function () {
+                                            const currentRow = this.closest('tr');
+                        
+                                            // Unhighlight the previously selected row
+                                            if (selectedRow) {
+                                                selectedRow.classList.remove('selected');
+                                            }
+                        
+                                            // Highlight the current row if the radio button is checked
+                                            if (this.checked) {
+                                                currentRow.classList.add('selected');
+                                                selectedRow = currentRow;
+                                            } else {
+                                                // If the radio button is unchecked, clear the selected row
+                                                selectedRow = null;
+                                            }
+                                        });
+                                    });
+                                })
+                                .catch(error => console.error(error));
+                        </script>
+                
                         <script>
         $(document).ready(function() {
             $('#dateTimeRange').daterangepicker({
                 autoUpdateInput: true,
                 timePicker: true,
-                timePickerIncrement: 15,
+                timePickerIncrement: 5,
                 locale: {
                     cancelLabel: 'Clear',
                     format: 'MM/DD/YYYY HH:mm',
@@ -161,6 +200,7 @@
             });
             $('#fetchForm').submit(function(e) {
                 e.preventDefault();
+                $('#result-container').html('<div id="loading" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: blue;"><i class="fas fa-spinner fa-spin fa-4x"></i><p>Loading...</p></div>');
                 var formData = $(this).serialize();
                 $.ajax({
                     type: 'POST',
@@ -176,7 +216,6 @@
                 });
             });
         });
-        
     </script>
                     </div>
                 </div>
