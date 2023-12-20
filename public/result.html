@@ -188,7 +188,7 @@ body {
                                                             } = chart;
                                                             ctx.save();
                                                         
-                                                            const angle = (Math.PI * ((speed - 45) / 10) * chart.options.plugins.pointer.percentage) + Math.PI;
+                                                       const angle = (Math.PI * ((speed - 41) / 13.5) * chart.options.plugins.pointer.percentage) + Math.PI;
                                                     
                                                         
                                                             const cx = width / 2;
@@ -261,7 +261,7 @@ body {
                                                             type: 'doughnut',
                                                             data: {
                                                             datasets: [{
-                                                              data: [45, 10, 0],
+                                                              data: [40, 10, 0],
                                                               backgroundColor: (context) => {
                                                                   const { ctx, chartArea } = context.chart;
                                                                   if (!chartArea) return;
