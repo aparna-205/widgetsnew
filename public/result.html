@@ -57,30 +57,36 @@ body {
   margin-bottom: 30px;
   border: 0px;
   border-radius: 0.625rem;
-  box-shadow: 6px 11px 41px -28px #9b92c7;
+  box-shadow: 6px 11px 41px -28px #867bc2;
   color: #fff !important;
-
-
 }
 .cardn {
-  background-image: linear-gradient(230deg, #fc5286, #fbaaa2);
+  background-image: linear-gradient(230deg, #759bff , #843cf6);
   height: 130px; /* Adjust this value as needed */
   margin-bottom: 30px;
   border: 0px;
   border-radius: 0.625rem;
-  box-shadow: 6px 11px 41px -28px #c79ac7;
+  box-shadow: 6px 11px 41px -28px  #867bc2;
   color: #fff !important;
 }
 .cardk{
-  background-image: linear-gradient(230deg, #ffc480, #ff763b);
+  background-image: linear-gradient(230deg, #759bff, #843cf6);
   height: 130px; /* Adjust this value as needed */
   margin-bottom: 30px;
   border: 0px;
   border-radius: 0.625rem;
-  box-shadow: 6px 11px 41px -28px #d4a359;
+  box-shadow: 6px 11px 41px -28px  #867bc2;
   color: #fff !important;
 }
-
+.cardk{
+  background-image: linear-gradient(230deg, #759bff, #843cf6);
+  height: 130px; /* Adjust this value as needed */
+  margin-bottom: 30px;
+  border: 0px;
+  border-radius: 0.625rem;
+  box-shadow: 6px 11px 41px -28px  #867bc2;
+  color: #fff !important;
+}
 </style>
 <main>
     <div class="container-fluid">
@@ -175,139 +181,129 @@ body {
                                                                 <div class="align-self-center">
                                                                   <p style="font-weight: bold; font-size:15px;">Average Battery Voltage</p>
 
-                                                      <canvas id="chart1" width="280" height="225"></canvas>
-                                                      <script>
-                                                        const speed = '{{avgvoltage}}';
+                                                                  <canvas id="chart1" width="280" height="225"></canvas>
+                                                                  <script>
+                                                        const voltage = '{{avgvoltage}}';
                                                         let animationAngle = 0;
-                                                        const guageNeedle = {
-                                                          id: "guageNeedle",
-                                                          afterDatasetsDraw: (chart) => {
-                                                            const {
-                                                              ctx,
-                                                              chartArea: { width }
-                                                            } = chart;
-                                                            ctx.save();
+const guageNeedle = {
+id: "guageNeedle",
+afterDatasetsDraw: (chart) => {
+const {
+ctx,
+chartArea: { width }
+} = chart;
+ctx.save();
+
+const angle = (Math.PI * ((voltage - 41) / 14.5) * chart.options.plugins.pointer.percentage) + Math.PI;
+const cx = width / 2;
+const cy = chart._metasets[0].data[0].y;
+
+ctx.translate(cx, cy);
+ctx.rotate(angle);
+ctx.beginPath();
+ctx.moveTo(0, -3);
+ctx.lineTo(cx, 0);
+ctx.lineTo(0, 3);
+ctx.fillStyle = "black";
+ctx.fill();
+ctx.rotate(-angle);
+ctx.translate(-cx, -cy);
+ctx.beginPath();
+ctx.arc(cx, cy, 5, 0, 10);
+ctx.fill();
+ctx.restore();
+}
+};
+const speedLabel = {
+id: "speedLabel",
+afterDatasetsDraw: (chart) => {
+const { ctx } = chart;
+
+var data = chart._metasets[0].data[0];
+var centerX = data.x;
+var centerY = data.y;
                                                         
-                                                           const angle = (Math.PI * ((speed - 41) / 14.5) * chart.options.plugins.pointer.percentage) + Math.PI;
-                                                    
-                                                        
-                                                            const cx = width / 2;
-                                                            const cy = chart._metasets[0].data[0].y;
-                                                        
-                                                            ctx.translate(cx, cy);
-                                                            ctx.rotate(angle);
-                                                            ctx.beginPath();
-                                                            ctx.moveTo(0, -3);
-                                                            ctx.lineTo(cx, 0);
-                                                            ctx.lineTo(0, 3);
-                                                            ctx.fillStyle = "black";
-                                                            ctx.fill();
-                                                            ctx.rotate(-angle);
-                                                    
-                                                            ctx.translate(-cx, -cy);
-                                                            ctx.beginPath();
-                                                            ctx.arc(cx, cy, 5, 0, 10);
-                                                            ctx.fill();
-                                                            ctx.restore();
-                                                          }
-                                                        };
-                                                        const speedLabel = {
-                                                          id: "speedLabel",
-                                                          afterDatasetsDraw: (chart) => {
-                                                            const { ctx } = chart;
-                                                        
-                                                            var data = chart._metasets[0].data[0];
-                                                            var centerX = data.x;
-                                                            var centerY = data.y;
-                                                        
-                                                            ctx.fillStyle = "black";
-                                                            ctx.font = `bolder 1.5em roboto`;
-                                                            ctx.textAlign = "center";
-                                                            ctx.fillText(speed+" V", centerX, centerY + 24);
-                                                          }
-                                                        };
-                                                        
-                                                        var pointer = {
-                                                            id: 'pointer',
-                                                            defaults:{
-                                                             percentage: 0,
-                                                             maxAngle: 0
-                                                            },
-                                                            afterDraw: function(chart, args, opt) {
-                                                              const { ctx } = chart;
-                                                        
-                                                              var data = chart._metasets[0].data[0];
-                                                              var radius = data.innerRadius + (data.outerRadius - data.innerRadius) / 2;
-                                                        
-                                                              var centerX = data.x;
-                                                              var centerY = data.y;
-                                                        
-                                                              const angle = (Math.PI * ((speed - 45) / 10) * chart.options.plugins.pointer.percentage) + Math.PI;
-                                                              var x = centerX + radius * Math.cos( angle );
-                                                              var y = centerY + radius * Math.sin( angle );
-                                                        
-                                                              ctx.save();
-                                                        
-                                                              ctx.beginPath();
-                                                              ctx.lineWidth = 6;
-                                                              ctx.arc(x, y, 12, 0, 2 * Math.PI);
-                                                              ctx.stroke();
-                                                        
-                                                              ctx.restore();
-                                                            },
-                                                        }
-                                                        
-                                                        var options = {
-                                                            type: 'doughnut',
-                                                            data: {
-                                                            datasets: [{
-                                                              data: [40, 10, 0],
-                                                              backgroundColor: (context) => {
-                                                                  const { ctx, chartArea } = context.chart;
-                                                                  if (!chartArea) return;
-                                                          
-                                                                  const gradientSegment = ctx.createLinearGradient(
-                                                                    chartArea.left,
-                                                                    0,
-                                                                    chartArea.right,
-                                                                    0
-                                                                  );
-                                                                  gradientSegment.addColorStop(0, "rgb(254,1,1)");
-                                                                  gradientSegment.addColorStop(0.5, "rgb(254,205,85)");
-                                                                  gradientSegment.addColorStop(1, "rgb(144,237,144)");
-                                                          
-                                                                  return gradientSegment;
-                                                                },
-                                                             
-                                                                borderWidth: 0
-                                                            }]},
-                                                            options: {
-                                                              cutout: 80,
-                                                              rotation: -90,
-                                                              circumference: 180,
-                                                              animation:{
-                                                                onProgress: function(context){
-                                                                    if(context.initial){
-                                                                        this.options.plugins.pointer.percentage = context.currentStep / context.numSteps;
-                                                                    }
-                                                                }
-                                                              },
-                                                              responsive:false,
+ctx.fillStyle = "black";
+ctx.font = `bolder 1.5em roboto`;
+ctx.textAlign = "center";
+ctx.fillText(voltage+" V", centerX, centerY + 24);
+}
+};
+
+var pointer = {
+id: 'pointer',
+defaults:{
+percentage: 0,
+maxAngle: 0
+},
+afterDraw: function(chart, args, opt) {
+const { ctx } = chart;
+
+var data = chart._metasets[0].data[0];
+var radius = data.innerRadius + (data.outerRadius - data.innerRadius) / 2;
+
+var centerX = data.x;
+var centerY = data.y;
+
+const angle = (Math.PI * ((voltage - 45) / 10) * chart.options.plugins.pointer.percentage) + Math.PI;
+var x = centerX + radius * Math.cos( angle );
+var y = centerY + radius * Math.sin( angle );
+ctx.save();
+ctx.beginPath();
+ctx.lineWidth = 6;
+ctx.arc(x, y, 12, 0, 2 * Math.PI);
+ctx.stroke();
+ctx.restore();
+},
+}
+var options = {
+type: 'doughnut',
+data: {
+datasets: [{
+data: [40, 10, 0],
+backgroundColor: (context) => {
+const { ctx, chartArea } = context.chart;
+if (!chartArea) return;
+const gradientSegment = ctx.createLinearGradient(
+chartArea.left,
+0,
+chartArea.right,
+0
+);
+gradientSegment.addColorStop(0, "rgb(254,1,1)");
+gradientSegment.addColorStop(0.5, "rgb(254,205,85)");
+gradientSegment.addColorStop(1, "rgb(144,237,144)");
+
+return gradientSegment;
+},
+borderWidth: 0
+}]},
+options: {
+cutout: 80,
+rotation: -90,
+                                   circumference: 180,
+                                    animation:{
+                                  onProgress: function(context){
+                                        if(context.initial){
+                                        this.options.plugins.pointer.percentage = context.currentStep / context.numSteps; 
+                                      }
+                                      }
+                                      },
+                                    responsive:false,
+
+                                  maintainAspectRatio: false,
+                                  legend: { display: false },
                                                               
-                                                              maintainAspectRatio: false,
-                                                              legend: { display: false },
-                                                              
-                                                              plugins:{ 
-                                                                tooltip: {  enabled: false },
-                                                                pointer: {currentAngle: 1}
-                                                              }
-                                                            }, 
-                                                            plugins:[guageNeedle,speedLabel]
-                                                        }
-                                                        
-                                                        const chart = document.getElementById('chart1')
-                                                        new Chart(chart, options);
-                                                      </script>
+                                  plugins:{ 
+                                  tooltip: {  enabled: false },
+                                  pointer: {currentAngle: 1}
+                                        }
+                                        }, 
+                                 plugins:[guageNeedle,speedLabel]
+                                  }
+                                const chart = document.getElementById('chart1')
+                                  new Chart(chart, options);
+                         </script>
                                                     </div>
                                                     
                                                                     </div>
@@ -317,17 +313,19 @@ body {
                                                               </div>
                                                             </div>
                                                         <div class="col-xl-5 col-md-5 ">
-                                                          <div class="card7-card">
-                                                            <div class="card7-content">
-                                                              <div class="card7-body cleartfix">
+                                                          <div class="card6-card">
+                                                            <div class="card6-content">
+                                                              <div class="card6-body cleartfix">
                                                                 <div class="media align-items-stretch">
                                                               <div class="align-self-center">
-                                                                <p style="font-size:25px; color:rgb(248, 242, 242);">Acceleration counts</p>
+                                                                <p style="font-weight: bold; font-size:15px;">Acceleration counts</p>
 
-                                                              </br>
-                                                          </br>
-                                                        </br>
-                                                      </br>
+                                                                <br>
+                                                                <br>
+                                                                <br>
+
+
+
 
                                                           <ul id="speedList"></ul>
                                                           <label for="minValue" style="font-size: 16px;">Minimum Value:</label>
@@ -335,11 +333,12 @@ body {
                                                           <br>
                                                           <label for="maxValue" style="font-size: 16px;">Maximum Value:</label>
                                                           <input type="number" style="font-size: 16px;" id="maxValue" step="0.01" value="25">
-                                                          
-                                              </br>
-                                              </br>
-                                            </br>
-                                          </br>
+                                                          <br>
+                                                          <br>
+                                                          <br>
+                                                          <br>
+                                                          <br>
+
 
                                               <h1> Count: <span id="idCountDisplay" class="big-text"></span></h1>
                                               
