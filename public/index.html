@@ -200,7 +200,7 @@
             });
             $('#fetchForm').submit(function(e) {
                 e.preventDefault();
-                $('#result-container').html('<div id="loading" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #ff8000;"><i class="fas fa-spinner fa-spin fa-4x"></i><p>Loading...</p></div>');
+                $('#result-container').html('<div id="loading" style="position: fixed; top: 50%; left: 60%; transform: translate(-30%, -70%); text-align: center; color: #ff8000;"><i class="fas fa-spinner fa-spin fa-4x"></i><p>Loading...</p></div>');
                 var formData = $(this).serialize();
                 $.ajax({
                     type: 'POST',
