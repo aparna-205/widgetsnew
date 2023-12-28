@@ -52,7 +52,7 @@ app.post('/fetch-data', (req, res) => {
             `;
             return res.send(noDataHtml);
         }
-        const excelFilePath = 'https://github.com/aparna-205/widgetsnew/blob/master/Travel_Summary_22-12-2023_12-18-29_PM.xlsx';
+const excelFilePath = 'https://raw.githubusercontent.com/aparna-205/widgetsnew/master/Travel_Summary_22-12-2023_12-18-29_PM.xlsx';
 const workbook = xlsx.readFile(excelFilePath);
 const sheetName = workbook.SheetNames[0];
 const sheet = workbook.Sheets[sheetName];
