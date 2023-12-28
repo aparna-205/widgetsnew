@@ -57,7 +57,10 @@ html {
   padding-left: 14rem !important; /* Use !important to override conflicting styles */
 }
 .real-padding {
-  padding-left: 15rem !important; /* Use !important to override conflicting styles */
+  padding-left: 25rem !important; /* Use !important to override conflicting styles */
+}
+.box-padding {
+  padding-left: 20rem !important; /* Use !important to override conflicting styles */
 }
 
 article, aside, figcaption, figure, footer, header, hgroup, main, nav, section {
