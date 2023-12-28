@@ -4,6 +4,8 @@ const imeiToObject = {}; // Define imeiToObject at a higher scope
 const bodyParser = require('body-parser');
 const moment = require('moment');
 const _ = require('lodash');
+const xlsx = require('xlsx');
+
 const app = express();
 const port = 1000;
 const pool = createPool({
