@@ -37,15 +37,6 @@ app.post('/fetch-data', (req, res) => {
     const fromDateTimeSQL = fromDateTimeObj.toISOString().slice(0, 19).replace('T', ' ');
     const toDateTimeSQL = toDateTimeObj.toISOString().slice(0, 19).replace('T', ' ');  // querying database and fetching data based on selected table and selected date
     const fetchDataQuery = `SELECT * FROM \`${selectedTable}\`WHERE date_time BETWEEN STR_TO_DATE(?, '%Y-%m-%d %H:%i:%s') AND STR_TO_DATE(?, '%Y-%m-%d %H:%i:%s');`;
-    const getTableNamesQuery = "SELECT TABLE_NAME FROM information_schema.TABLES WHERE table_schema = 'ingodata';";
-    pool.query(getTableNamesQuery, (err, results) => {
-        if (err) {
-            console.error('Error fetching table names:', err);
-            return res.status(500).json({ error: 'Error fetching table names' });
-        }
-        const tableNames = results.map((row) => row.TABLE_NAME);
-
-    });
     pool.query(fetchDataQuery, [fromDateTimeObj, toDateTimeObj], (err, results) => {
         if (err) {
             console.error(`Error fetching data from ${selectedTable}:`, err);
@@ -59,6 +50,17 @@ app.post('/fetch-data', (req, res) => {
             `;
             return res.send(noDataHtml);
         }
+        const excelFilePath = 'C:\\Users\\Aparna\\Desktop\\newnodewidgetsapp\\Travel_Summary_22-12-2023_12-18-29_PM.xlsx';
+const workbook = xlsx.readFile(excelFilePath);
+const sheetName = workbook.SheetNames[0];
+const sheet = workbook.Sheets[sheetName];
+const datatop = xlsx.utils.sheet_to_json(sheet);
+const endOdometerColumn = datatop.map(item => ({ 'vehicle': item['Object'], 'EndOdometer': item['EndOdometer'] }));
+const sortdata = endOdometerColumn.sort((a, b) => b['EndOdometer'] - a['EndOdometer']);
+const top5Records = sortdata.slice(0, 5);
+
+console.log(top5Records);
+
 const data = results;
 const formattedDataArray = data.map(item => {
   return {
@@ -180,8 +182,6 @@ for (const unit of subLists) {
                avgvoltage = (sumOfAverageVoltage / filteredDataLength).toFixed(2);
            }
 
-          
-        
             const avgKmByDate = {};
             const timeDifferences = {};
 
@@ -373,17 +373,12 @@ const avgKmByDayAndHourJSON = JSON.stringify(avgKmByDayAndHour);
         }));
         const maxSpeedData1 = maxSpeedData;
           const maxSpeedByDate1 = {};
-          
           maxSpeedData1.forEach((entry) => {
             maxSpeedByDate1[entry.date] = entry.speed;
           });
-          
           const maxSpeedDataJSON1 = JSON.stringify(maxSpeedByDate1);
           const maxSpeedDataJSON = JSON.stringify(maxSpeedData);
-
-
           const avgSpeedByDate = {};
-
           data.forEach((row) => {
             if (row['IGN'] === 'ON' && !isNaN(row['Speed']) && row['Speed'] !== 0) {
               const currentDate = new Date(row['date_time']); // Assuming 'date_time' is the date column name
@@ -392,7 +387,6 @@ const avgKmByDayAndHourJSON = JSON.stringify(avgKmByDayAndHour);
               if (!avgSpeedByDate[formattedDate]) {
                 avgSpeedByDate[formattedDate] = [];
               }
-              // Add the current speed to the array for the current date
               avgSpeedByDate[formattedDate].push(currentSpeed);
             }
           });
@@ -401,157 +395,40 @@ const avgKmByDayAndHourJSON = JSON.stringify(avgKmByDayAndHour);
             const speeds = avgSpeedByDate[date];
             if (speeds.length > 0) {
               const sumSpeed = speeds.reduce((acc, speed) => acc + speed, 0);
-              const averageSpeed = (sumSpeed / speeds.length).toFixed(2); // Limit to 2 decimal places
-          
+              const averageSpeed = (sumSpeed / speeds.length).toFixed(2); 
               return {
                 date,
                 averageSpeed,
               };
             } else {
-              // Handle the case where there are no valid speeds for the date (speeds array is empty)
               return {
                 date,
-                averageSpeed: 0, // You can set it to 0 or any other default value
+                averageSpeed: 0,
               };
             }
           });
         const avgSpeedDataJSON = JSON.stringify(avgSpeedData);
         const avgSpeedDataJSON1 = avgSpeedDataJSON;
-        const avgSpeedDataArray = JSON.parse(avgSpeedDataJSON1); // Parse the JSON string into an array
+
+        const avgSpeedDataArray = JSON.parse(avgSpeedDataJSON1);
         const avgSpeedDataObject = {};
         avgSpeedDataArray.forEach((entry) => {
         avgSpeedDataObject[entry.date] = parseFloat(entry.averageSpeed);
         });
         const avgSpeedDataMergedJSON = JSON.stringify(avgSpeedDataObject);
         const filteredData = formattedDataArray.filter(item => parseFloat(item['External Voltage']) > 40);  
-
 const dateTimes = filteredData.map(entry => entry.date_time);
-
 const distance = filteredData.map(entry => entry['Last Distance (meters)']);
 const externalVoltages = filteredData.map(entry => entry['External Voltage']);
 const integerList = externalVoltages.map(parseFloat);
-
 const combinedData = dateTimes.map((dateTime, index) => ({
   dateTime,
   integerValue: integerList[index],
   Distance: distance[index]
 }));
-function calculateSMA(combinedData, windowSize) {
-  const smoothedData = [];
-  for (let i = 0; i < combinedData.length; i++) {
-    const start = Math.max(0, i - Math.floor(windowSize / 2));
-    const end = Math.min(combinedData.length - 1, i + Math.ceil(windowSize / 2));
+const toparray = JSON.stringify(top5Records); // Parse the JSON string into an array
 
-    const sum = combinedData.slice(start, end + 1)
-      .reduce((acc, entry) => acc + entry.integerValue, 0);
-    
-    const average = sum / (end - start + 1);
-
-    smoothedData.push(average);
-  }
-  return smoothedData;
-}
-const windowSize = 20; 
-const smoothedCurve = calculateSMA(combinedData, windowSize);
-
-const combinedSmoothedData = dateTimes.map((dateTime, index) => ({
-  dateTime,
-  distancevalue:distance[index],
-  smoothedValue: smoothedCurve[index]
-}));
-
-  function argrelextrema(values, comparator, order) {
-    const extremaIndices = [];
-    for (let i = order; i < values.length - order; i++) {
-      const subArray = values.slice(i - order, i + order + 1);
-      const isExtrema = subArray.every((value, index) => comparator(value, subArray[order]) || index === order);
-
-      if (isExtrema) {
-        extremaIndices.push(i);
-      }
-    }
-  
-    return extremaIndices;
-  }
-  function argrelminima(values, comparator, order) {
-    const minimaIndices = [];
-    for (let i = order; i < values.length - order; i++) {
-      const subArray = values.slice(i - order, i + order + 1);
-      const isMinima = subArray.every((value, index) => comparator(value, subArray[order]) || index === order);
-      if (isMinima) {
-        minimaIndices.push(i);
-      }
-    }
-  
-    return minimaIndices;
-  }
-  const minimaIndices = argrelminima(
-    combinedSmoothedData.map(entry => entry.smoothedValue),
-    (a, b) => a >b,
-    350
-  );
-  const maximaIndices = argrelextrema(
-    combinedSmoothedData.map(entry => entry.smoothedValue),
-    (a, b) => a <=b,
-    350
-  );
-  const maximaData = maximaIndices.map(index => combinedSmoothedData[index].smoothedValue);
-  const minimaData = minimaIndices.map(index => combinedSmoothedData[index].smoothedValue);
-  
-  const correspondingdates = [...new Set(maximaIndices.map(index => combinedSmoothedData[0].dateTime))];
-  const indicesOfDates = correspondingdates.map(date => combinedSmoothedData.findIndex(entry => entry.dateTime === date));
-  const zerothindex = indicesOfDates.concat(maximaIndices);
-  const correspondingData = [...new Set(zerothindex.map(index => combinedSmoothedData[index]))];
-  const correspondingData1 = minimaIndices.map(index => combinedSmoothedData[index]);
-  
-  const interleavedData = [];
-  
-  const maxLength = Math.max(correspondingData.length, correspondingData1.length);
-  
-  for (let i = 0; i < maxLength; i++) {
-    if (i < correspondingData.length) {
-      interleavedData.push(correspondingData[i]);
-    }
-    if (i < correspondingData1.length) {
-      interleavedData.push(correspondingData1[i]);
-    }
-  }
-  
-  const result = [];
-
-// Check if both arrays have the same length
-if (interleavedData.length !== combinedSmoothedData.length) {
-  const length = interleavedData.length;
-
-  // Iterate over interleavedData in steps of 2
-  for (let i = 0; i < length - 1; i += 2) {
-    const startData = interleavedData[i];
-    const endData = interleavedData[i + 1];
-
-    // Perform your calculation using combinedSmoothedData or other data
-    // Modify this part according to your specific calculation
-    const startIndex = combinedSmoothedData.findIndex(entry => entry.dateTime === startData.dateTime);
-    const endIndex = combinedSmoothedData.findIndex(entry => entry.dateTime === endData.dateTime);
-
-    const filteredData = combinedSmoothedData.slice(startIndex, endIndex + 1);
-    const sumDistance = filteredData.reduce((sum, entry) => sum + parseInt(entry['distancevalue']), 0);
-    const multipliedSumDistance = (sumDistance * 0.001).toFixed(2);
-
-    result.push({
-      start_date_time: startData.dateTime,
-      end_date_time: endData.dateTime,
-      start_voltage:startData.smoothedValue,
-      end_voltage:endData.smoothedValue,
-      sum_distance: multipliedSumDistance
-    });
-  }
-
-} else {
-  console.error('Arrays do not have the same length.');
-}
-
-
-        const htmlTemplatePath = path.join(__dirname, 'public', 'result.html');
+       const htmlTemplatePath = path.join(__dirname, 'public', 'result.html');
         fs.readFile(htmlTemplatePath, 'utf8', (err, template) => {
             if (err) {
                 console.error('Error reading template file:', err);
@@ -562,7 +439,7 @@ if (interleavedData.length !== combinedSmoothedData.length) {
                 .replace('{{avgvoltage}}', avgvoltage)
                 .replace('{{distancecurve}}', distancecurve)
                 .replace('{{voltagecurve}}', voltagecurve)
-                .replace('{{result}}',JSON.stringify(result))
+                .replace('{{toparray}}',toparray)
                 .replace('{{data}}',JSON.stringify(data))
                 .replace('{{formattedAverageDuration}}', formattedAverageDuration)
                 .replace('{{formattedAverageDurationSubtraction}}', formattedAverageDurationSubtraction)
@@ -582,6 +459,4 @@ if (interleavedData.length !== combinedSmoothedData.length) {
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
-
-
 
