@@ -1,19 +1,22 @@
 const { createPool } = require('mysql');
 const express = require('express');
+const xlsx = require('xlsx');
+const mysql = require('mysql');
+
 const imeiToObject = {}; // Define imeiToObject at a higher scope
 const bodyParser = require('body-parser');
 const moment = require('moment');
 const _ = require('lodash');
-const xlsx = require('xlsx');
-
 const app = express();
-const port = 1000;
+const compression = require('compression');
+app.use(compression());
+const port = 3000;
 const pool = createPool({
-    host: 'database-1.cbjabnlglbz6.ap-south-1.rds.amazonaws.com',
-    user: 'admin',
-    password: 'ingo1234',
-    database: 'ingodata',
-    connectionLimit: 10
+  host: 'database-1.cbjabnlglbz6.ap-south-1.rds.amazonaws.com',
+  user: 'admin',
+  password: 'ingo1234',
+  database: 'ingodata',
+  connectionLimit: 10
 });
 const fs = require('fs');
 const path = require('path');
@@ -48,20 +51,33 @@ app.post('/fetch-data', (req, res) => {
             // Handle the case when no data is found
             const noDataHtml = `
             <h1>No data found for the selected date range.</h1>
-
             `;
             return res.send(noDataHtml);
         }
-const excelFilePath = 'https://raw.githubusercontent.com/aparna-205/widgetsnew/master/Travel_Summary_22-12-2023_12-18-29_PM.xlsx';
-const workbook = xlsx.readFile(excelFilePath);
-const sheetName = workbook.SheetNames[0];
-const sheet = workbook.Sheets[sheetName];
-const datatop = xlsx.utils.sheet_to_json(sheet);
-const endOdometerColumn = datatop.map(item => ({ 'vehicle': item['Object'], 'EndOdometer': item['EndOdometer'] }));
-const sortdata = endOdometerColumn.sort((a, b) => b['EndOdometer'] - a['EndOdometer']);
-const top5Records = sortdata.slice(0, 5);
+        const connection = mysql.createConnection({
+          host: 'database-1.cbjabnlglbz6.ap-south-1.rds.amazonaws.com',
+          user: 'admin',
+          password: 'ingo1234',
+          database: 'top5',
+        });
+        
+        const newQuery = "SELECT * FROM travel_summary ";
+        
+        connection.query(newQuery, (error, results5, fields) => {
+          if (error) {
+            console.error('Error executing query:', error);
+          } else {
+            console.log('Query results:', results5);
+          }
+        const datafromtop5 = results5;
+        const odocolumn = datafromtop5.map(item => ({ 'vehicle': item['Object'], 'EndOdometer': item['EndOdometer'] }));
+        const sortdata = odocolumn.sort((a, b) => b['EndOdometer'] - a['EndOdometer']);
+        const top5Records = sortdata.slice(0, 5);
+        console.log(sortdata);
+          // Close the connection
+        const toparray = JSON.stringify(top5Records); // Parse the JSON string into an array
 
-console.log(top5Records);
+
 
 const data = results;
 const formattedDataArray = data.map(item => {
@@ -428,7 +444,6 @@ const combinedData = dateTimes.map((dateTime, index) => ({
   integerValue: integerList[index],
   Distance: distance[index]
 }));
-const toparray = JSON.stringify(top5Records); // Parse the JSON string into an array
 
        const htmlTemplatePath = path.join(__dirname, 'public', 'result.html');
         fs.readFile(htmlTemplatePath, 'utf8', (err, template) => {
@@ -457,8 +472,8 @@ const toparray = JSON.stringify(top5Records); // Parse the JSON string into an a
         });
     });
 });
+});
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
-
