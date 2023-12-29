@@ -742,7 +742,8 @@ body {
                 ctx.strokeStyle = dataset.borderColor[index];
                 ctx.stroke();
                 const textWidth = ctx.measureText(chart.data.labels[index]).width;
-                ctx.font = '10px Arial';
+                ctx.font = '13px Roboto sans-serif';
+
                 const textXposition = x >= halfwidth ? 'left' : 'right';
                 ctx.textAlign = textXposition;
                 ctx.textBaseline = 'middle';
@@ -782,7 +783,11 @@ body {
               },
               title: {
                 display: true,
-                text: 'Top 5 Customers'
+                text: 'Top 5 Customers',
+                  font: {
+                  size: 16, // Set the font size to your desired value
+                  family: 'Roboto sans-serif' // Set the font style to your desired value
+                }
               }
             }
           },
