@@ -670,78 +670,7 @@ rotation: -90,
                                                             </div>
                                                           </div>
                                                             
-                                                  <div class="row real-padding"> <!-- Add a custom class for more specific targeting -->
-                                                    <div class="col-xl-10 col-md-10" >
-                                                                    <div class="custom-section-card">
-                                                                      <div class="custom-section-card-content">
-                                                                        <div class="custom-section-card-body cleartfix">
-                                                                          <div class="media align-items-stretch">
-                                                                            <div class="align-self-center"></div>   
-                                                                            <div id="lineChart"></div>
-                                                                            <script>
-                                                                              const voltageCurveJson = {{voltagecurve}};
-                                                                              const distancecurveJson = {{distancecurve}};
-                                                                          
-                                                                              // Primary Y-axis data
-                                                                              const xData = voltageCurveJson.map(entry => entry.concatenatedDate);
-                                                                              const yData = voltageCurveJson.map(entry => entry.voltagedata
-                                                                              );
-                                                                          
-                                                                              // Secondary Y-axis data
-                                                                              const x2 = distancecurveJson.map(entry => entry.concatenatedDateTime);
-                                                                              const y2 = distancecurveJson.map(entry => entry.Distance);
-                                                                          
-                                                                              // Create line traces for primary and secondary axes
-                                                                              const trace1 = {
-                                                                                  x: xData,
-                                                                                  y: yData,
-                                                                                  type: 'line',
-                                                                                  name: 'Voltage',
-                                                                                  marker: {
-                                                                                      color: 'green',
-                                                                                  },
-                                                                              };
-                                                                          
-                                                                              const trace3 = {
-                                                                                  x: x2,
-                                                                                  y: y2,
-                                                                                  type: 'bar',
-                                                                                  name: 'Distance',
-                                                                                  yaxis: 'y2',  // Associate with the secondary y-axis
-                                                                                  marker: {
-                                                                                      color: 'blue',
-                                                                                  },
-                                                                              };
-                                                                          
-                                                                              const layout8 = {
-                                                                                  title: ' Battery Voltage and Range',
-                                                                                  width: 1050,
-                                                                                  height: 450,
-                                                                                  xaxis: {
-                                                                                      title: 'Time ',
-                                                                                  },
-                                                                                  yaxis: {
-                                                                                      title: 'Voltage',
-
-                                                                                  },
-                                                                                  yaxis2: {
-                                                                                      title: 'Distance',
-                                                                                      overlaying: 'y',
-                                                                                      side: 'right',
-                                                                                      range: [0, 50],
-
-                                                                                  },
-                                                                              };
-                                                                          
-                                                                              Plotly.newPlot('lineChart', [trace1, trace3], layout8);
-                                                                          </script>
-                                                                          
-                                                                          </div>    
-                                                                        </div>
-                                                                      </div>
-                                                                    </div>
-                                                                  </div>
-                                                                </div>
+                                                
                                                             
                                                   <div class="row box-padding"> <!-- Add a custom class for more specific targeting -->
                                                     <div class="col-xl-10 col-md-10" >
@@ -835,6 +764,78 @@ rotation: -90,
         var ctx = document.getElementById('myChart').getContext('2d');
         var myChart = new Chart(ctx, config);
       </script>
+                                                                          </div>    
+                                                                        </div>
+                                                                      </div>
+                                                                    </div>
+                                                                  </div>
+                                                                </div>
+                <div class="row real-padding"> <!-- Add a custom class for more specific targeting -->
+                                                    <div class="col-xl-10 col-md-10" >
+                                                                    <div class="custom-section-card">
+                                                                      <div class="custom-section-card-content">
+                                                                        <div class="custom-section-card-body cleartfix">
+                                                                          <div class="media align-items-stretch">
+                                                                            <div class="align-self-center"></div>   
+                                                                            <div id="lineChart"></div>
+                                                                            <script>
+                                                                              const voltageCurveJson = {{voltagecurve}};
+                                                                              const distancecurveJson = {{distancecurve}};
+                                                                          
+                                                                              // Primary Y-axis data
+                                                                              const xData = voltageCurveJson.map(entry => entry.concatenatedDate);
+                                                                              const yData = voltageCurveJson.map(entry => entry.voltagedata
+                                                                              );
+                                                                          
+                                                                              // Secondary Y-axis data
+                                                                              const x2 = distancecurveJson.map(entry => entry.concatenatedDateTime);
+                                                                              const y2 = distancecurveJson.map(entry => entry.Distance);
+                                                                          
+                                                                              // Create line traces for primary and secondary axes
+                                                                              const trace1 = {
+                                                                                  x: xData,
+                                                                                  y: yData,
+                                                                                  type: 'line',
+                                                                                  name: 'Voltage',
+                                                                                  marker: {
+                                                                                      color: 'green',
+                                                                                  },
+                                                                              };
+                                                                          
+                                                                              const trace3 = {
+                                                                                  x: x2,
+                                                                                  y: y2,
+                                                                                  type: 'bar',
+                                                                                  name: 'Distance',
+                                                                                  yaxis: 'y2',  // Associate with the secondary y-axis
+                                                                                  marker: {
+                                                                                      color: 'blue',
+                                                                                  },
+                                                                              };
+                                                                          
+                                                                              const layout8 = {
+                                                                                  title: ' Battery Voltage and Range',
+                                                                                  width: 1050,
+                                                                                  height: 450,
+                                                                                  xaxis: {
+                                                                                      title: 'Time ',
+                                                                                  },
+                                                                                  yaxis: {
+                                                                                      title: 'Voltage',
+
+                                                                                  },
+                                                                                  yaxis2: {
+                                                                                      title: 'Distance',
+                                                                                      overlaying: 'y',
+                                                                                      side: 'right',
+                                                                                      range: [0, 50],
+
+                                                                                  },
+                                                                              };
+                                                                          
+                                                                              Plotly.newPlot('lineChart', [trace1, trace3], layout8);
+                                                                          </script>
+                                                                          
                                                                           </div>    
                                                                         </div>
                                                                       </div>
