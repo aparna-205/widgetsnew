@@ -203,150 +203,155 @@ body {
                                                                   <canvas id="chart1" width="280" height="225"></canvas>
                                                                    <script>
                                                         const voltage = '{{avgvoltage}}';
-                                                        let animationAngle = 0;
-                                                        const guageNeedle = {
-                                                          id: "guageNeedle",
-                                                          afterDatasetsDraw: (chart) => {
-                                                            const {
-                                                              ctx,
-                                                              chartArea: { width }
-                                                            } = chart;
-                                                            ctx.save();
-                                                        
-                                                            let angle;
-                                                        
-                                                            if (parseFloat(voltage) === 0) {
-                                                              // Handle special case for voltage = 0
-                                                              angle = Math.PI; // Set a fixed angle for voltage = 0
-                                                            } else {
-                                                              angle =
-                                                                Math.PI *
-                                                                  ((parseFloat(voltage) - 41) / 14.5) *
-                                                                  chart.options.plugins.pointer.percentage +
-                                                                Math.PI;
-                                                            }
-                                                        
-                                                            const cx = width / 2;
-                                                            const cy = chart._metasets[0].data[0].y;
-                                                        
-                                                            ctx.translate(cx, cy);
-                                                            ctx.rotate(angle);
-                                                            ctx.beginPath();
-                                                            ctx.moveTo(0, -3);
-                                                            ctx.lineTo(cx, 0);
-                                                            ctx.lineTo(0, 3);
-                                                            ctx.fillStyle = "black";
-                                                            ctx.fill();
-                                                            ctx.rotate(-angle);
-                                                            ctx.translate(-cx, -cy);
-                                                            ctx.beginPath();
-                                                            ctx.arc(cx, cy, 5, 0, 10);
-                                                            ctx.fill();
-                                                            ctx.restore();
-                                                          }
-                                                        };
-                                                        
-                                                        // ... (rest of your code)
-                                                        
-                                                        const speedLabel = {
-                                                          id: "speedLabel",
-                                                          afterDatasetsDraw: (chart) => {
-                                                            const { ctx } = chart;
-                                                        
-                                                            var data = chart._metasets[0].data[0];
-                                                            var centerX = data.x;
-                                                            var centerY = data.y;
-                                                        
-                                                            ctx.fillStyle = "black";
-                                                            ctx.font = `bolder 1.5em roboto`;
-                                                            ctx.textAlign = "center";
-                                                            ctx.fillText(voltage + " V", centerX, centerY + 24);
-                                                          }
-                                                        };
-                                                        
-                                                        var pointer = {
-                                                          id: "pointer",
-                                                          defaults: {
-                                                            percentage: 0,
-                                                            maxAngle: 0
-                                                          },
-                                                          afterDraw: function (chart, args, opt) {
-                                                            const { ctx } = chart;
-                                                            const angle =
-                                                              voltage === "0" || voltage === "41"
-                                                                ? fixedAngle
-                                                                : Math.PI *
-                                                                    ((parseFloat(voltage) - 40) / 10) *
-                                                                    chart.options.plugins.pointer.percentage +
-                                                                  Math.PI;
-                                                        
-                                                            var data = chart._metasets[0].data[0];
-                                                            var radius = data.innerRadius + (data.outerRadius - data.innerRadius) / 2;
-                                                        
-                                                            var centerX = data.x;
-                                                            var centerY = data.y;
-                                                        
-                                                            var x = centerX + radius * Math.cos(angle);
-                                                            var y = centerY + radius * Math.sin(angle);
-                                                            ctx.save();
-                                                            ctx.beginPath();
-                                                            ctx.lineWidth = 6;
-                                                            ctx.arc(x, y, 12, 0, 2 * Math.PI);
-                                                            ctx.stroke();
-                                                            ctx.restore();
-                                                          }
-                                                        };
-                                                        var options = {
-                                                          type: "doughnut",
-                                                          data: {
-                                                            datasets: [
-                                                              {
-                                                                data: [40, 10, 0],
-                                                                backgroundColor: (context) => {
-                                                                  const { ctx, chartArea } = context.chart;
-                                                                  if (!chartArea) return;
-                                                                  const gradientSegment = ctx.createLinearGradient(
-                                                                    chartArea.left,
-                                                                    0,
-                                                                    chartArea.right,
-                                                                    0
-                                                                  );
-                                                                  gradientSegment.addColorStop(0, "rgb(254,1,1)");
-                                                                  gradientSegment.addColorStop(0.5, "rgb(254,205,85)");
-                                                                  gradientSegment.addColorStop(1, "rgb(144,237,144)");
-                                                        
-                                                                  return gradientSegment;
-                                                                },
-                                                                borderWidth: 0
-                                                              }
-                                                            ]
-                                                          },
-                                                          options: {
-                                                            cutout: 80,
-                                                            rotation: -90,
-                                                            circumference: 180,
-                                                            animation: {
-                                                              onProgress: function (context) {
-                                                                if (context.initial) {
-                                                                  this.options.plugins.pointer.percentage =
-                                                                    context.currentStep / context.numSteps;
-                                                                }
-                                                              }
-                                                            },
-                                                            responsive: false,
-                                                        
-                                                            maintainAspectRatio: false,
-                                                            legend: { display: false },
-                                                        
-                                                            plugins: {
-                                                              tooltip: { enabled: false },
-                                                              pointer: { currentAngle: 1 }
-                                                            }
-                                                          },
-                                                          plugins: [guageNeedle, speedLabel]
-                                                        };
-                                                        const chart = document.getElementById("chart1");
-                                                        new Chart(chart, options);
+                                                       let animationAngle = 0;
+
+const fixedAngle = Math.PI; // Set a fixed angle when voltage is less than 41 or equal to 41
+
+const guageNeedle = {
+  id: "guageNeedle",
+  afterDatasetsDraw: (chart) => {
+    const {
+      ctx,
+      chartArea: { width }
+    } = chart;
+    ctx.save();
+
+    let angle;
+
+    if (parseFloat(voltage) <= 41) {
+      // Handle special case for voltage less than or equal to 41
+      angle = fixedAngle;
+    } else {
+      angle =
+        Math.PI *
+        ((parseFloat(voltage) - 41) / 14.5) *
+        chart.options.plugins.pointer.percentage +
+        Math.PI;
+    }
+
+    const cx = width / 2;
+    const cy = chart._metasets[0].data[0].y;
+
+    ctx.translate(cx, cy);
+    ctx.rotate(angle);
+    ctx.beginPath();
+    ctx.moveTo(0, -3);
+    ctx.lineTo(cx, 0);
+    ctx.lineTo(0, 3);
+    ctx.fillStyle = "black";
+    ctx.fill();
+    ctx.rotate(-angle);
+    ctx.translate(-cx, -cy);
+    ctx.beginPath();
+    ctx.arc(cx, cy, 5, 0, 10);
+    ctx.fill();
+    ctx.restore();
+  }
+};
+
+// ... (rest of your code)
+
+// ... (rest of your code)
+
+const speedLabel = {
+  id: "speedLabel",
+  afterDatasetsDraw: (chart) => {
+    const { ctx } = chart;
+
+    var data = chart._metasets[0].data[0];
+    var centerX = data.x;
+    var centerY = data.y;
+
+    ctx.fillStyle = "black";
+    ctx.font = `bolder 1.5em roboto`;
+    ctx.textAlign = "center";
+    ctx.fillText(voltage + " V", centerX, centerY + 24);
+  }
+};
+
+var pointer = {
+  id: "pointer",
+  defaults: {
+    percentage: 0,
+    maxAngle: 0
+  },
+  afterDraw: function (chart, args, opt) {
+    const { ctx } = chart;
+    const angle =
+      voltage === "0" || voltage === "41"
+        ? fixedAngle
+        : Math.PI *
+            ((parseFloat(voltage) - 40) / 10) *
+            chart.options.plugins.pointer.percentage +
+          Math.PI;
+
+    var data = chart._metasets[0].data[0];
+    var radius = data.innerRadius + (data.outerRadius - data.innerRadius) / 2;
+
+    var centerX = data.x;
+    var centerY = data.y;
+
+    var x = centerX + radius * Math.cos(angle);
+    var y = centerY + radius * Math.sin(angle);
+    ctx.save();
+    ctx.beginPath();
+    ctx.lineWidth = 6;
+    ctx.arc(x, y, 12, 0, 2 * Math.PI);
+    ctx.stroke();
+    ctx.restore();
+  }
+};
+var options = {
+  type: "doughnut",
+  data: {
+    datasets: [
+      {
+        data: [40, 10, 0],
+        backgroundColor: (context) => {
+          const { ctx, chartArea } = context.chart;
+          if (!chartArea) return;
+          const gradientSegment = ctx.createLinearGradient(
+            chartArea.left,
+            0,
+            chartArea.right,
+            0
+          );
+          gradientSegment.addColorStop(0, "rgb(254,1,1)");
+          gradientSegment.addColorStop(0.5, "rgb(254,205,85)");
+          gradientSegment.addColorStop(1, "rgb(144,237,144)");
+          return gradientSegment;
+        },
+        borderWidth: 0
+      }
+    ]
+  },
+  options: {
+    cutout: 80,
+    rotation: -90,
+    circumference: 180,
+    animation: {
+      onProgress: function (context) {
+        if (context.initial) {
+          this.options.plugins.pointer.percentage =
+            context.currentStep / context.numSteps;
+        }
+      }
+    },
+    responsive: false,
+
+    maintainAspectRatio: false,
+    legend: { display: false },
+
+    plugins: {
+      tooltip: { enabled: false },
+      pointer: { currentAngle: 1 }
+    }
+  },
+  plugins: [guageNeedle, speedLabel]
+};
+const chart = document.getElementById("chart1");
+new Chart(chart, options);
+
                                                         
                          </script>
                                         
