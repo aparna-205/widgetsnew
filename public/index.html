@@ -182,7 +182,7 @@
           });
           $('#fetchForm').submit(function(e) {
               e.preventDefault();
-              $('#result-container').html('<div id="loading" style="position: fixed; top: 50%; left: 60%; transform: translate(-30%, -70%); text-align: center; color: blue;"><i class="fas fa-spinner fa-spin fa-4x"></i><p>Loading...</p></div>');
+              $('#result-container').html('<div id="loading" style="position: fixed; top: 50%; left: 55%; transform: translate(-40%, -60%); text-align: center; color: blue;"><i class="fas fa-spinner fa-spin fa-4x"></i><p>Loading...</p></div>');
               var formData = $(this).serialize();
               $.ajax({
                   type: 'POST',
