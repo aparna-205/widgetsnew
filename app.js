@@ -9,7 +9,7 @@ const moment = require('moment');
 const _ = require('lodash');
 const app = express();
 
-const port = 4000;
+const port = 1000;
 const pool = createPool({
   host: 'database-1.cbjabnlglbz6.ap-south-1.rds.amazonaws.com',
   user: 'admin',
