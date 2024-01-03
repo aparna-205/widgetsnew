@@ -9,7 +9,7 @@ const moment = require('moment');
 const _ = require('lodash');
 const app = express();
 
-const port = 1000;
+const port = 4000;
 const pool = createPool({
   host: 'database-1.cbjabnlglbz6.ap-south-1.rds.amazonaws.com',
   user: 'admin',
@@ -49,6 +49,14 @@ app.post('/fetch-data', (req, res) => {
         if (!results || results.length === 0) {
             // Handle the case when no data is found
             const noDataHtml = `
+            </br>
+            </br>
+            </br>
+            </br>
+            </br>
+            </br>
+            </br>
+            </br>
             <h1>No data found for the selected date range.</h1>
             `;
             return res.send(noDataHtml);
@@ -72,7 +80,6 @@ app.post('/fetch-data', (req, res) => {
         const odocolumn = datafromtop5.map(item => ({ 'vehicle': item['Object'], 'EndOdometer': item['EndOdometer'] }));
         const sortdata = odocolumn.sort((a, b) => b['EndOdometer'] - a['EndOdometer']);
         const top5Records = sortdata.slice(0, 5);
-        console.log(sortdata);
           // Close the connection
         const toparray = JSON.stringify(top5Records); // Parse the JSON string into an array
 
