@@ -505,3 +505,28 @@
   .selected {
     background-color: #dbd3cb; /* You can adjust the background color as needed */
 }
+@media only screen and (max-width: 367px) {
+  .table-scroll {
+    max-height: 20vh; /* Adjust the height for small screens */
+  }
+}
+
+@media only screen and (max-width: 467px) {
+  .table-scroll {
+    max-height: 30vh; /* Adjust the height for small screens */
+  }
+}
+
+/* Adjust the height for medium screens */
+@media only screen and (min-width: 780px) and (max-width: 991px) {
+  .table-scroll {
+    max-height: 50vh; /* Adjust the height for medium screens */
+  }
+}
+
+/* Adjust the height for large screens */
+@media only screen and (min-width: 992px) {
+  .table-scroll {
+    max-height: 82vh; /* Adjust the height for large screens */
+  }
+}
