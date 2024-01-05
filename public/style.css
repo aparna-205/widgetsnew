@@ -530,3 +530,24 @@
     max-height: 82vh; /* Adjust the height for large screens */
   }
 }
+.circularDiv {
+  border-radius: 50%;
+  width: 10px; /* Adjust the size as needed */
+  height: 10px; /* Adjust the size as needed */
+}
+
+.redCircle {
+  background-color: red;
+}
+
+.greenCircle {
+  background-color: green;
+}
+
+.redButton {
+  background-color: red;
+}
+
+.greenButton {
+  background-color: green;
+}
