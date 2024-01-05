@@ -19,17 +19,23 @@ const pool = createPool({
 });
 const fs = require('fs');
 const path = require('path');
-const getTableNamesQuery = "SELECT TABLE_NAME FROM information_schema.TABLES WHERE table_schema = 'ingodata';";
+const getTableNamesQuery = `SELECT table_name, table_rows FROM information_schema.tables WHERE table_schema = 'ingodata';`;
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
+
 app.get('/getTableNames', (req, res) => {
     pool.query(getTableNamesQuery, (err, results) => {
         if (err) {
             console.error('Error fetching table names:', err);
             return res.status(500).json({ error: 'Error fetching table names' });
         }
-        const tableNames = results.map((row) => row.TABLE_NAME);
-        res.json({ tableNames });
+
+        const tableInfo = results.map((row) => ({
+            tableName: row.TABLE_NAME,
+            rowCount: row.TABLE_ROWS,
+        }));
+        res.json({ tableInfo });
     });
 });
 app.post('/fetch-data', (req, res) => {
