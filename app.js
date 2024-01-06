@@ -30,14 +30,33 @@ app.get('/getTableNames', (req, res) => {
             console.error('Error fetching table names:', err);
             return res.status(500).json({ error: 'Error fetching table names' });
         }
+        const connection = mysql.createConnection({
+          host: 'database-1.cbjabnlglbz6.ap-south-1.rds.amazonaws.com',
+          user: 'admin',
+          password: 'ingo1234',
+          database: 'top5',
+        });
+        const newQuery = "SELECT * FROM results1 ";
+        connection.query(newQuery, (error, results2, fields) => {
+          if (error) {
+            console.error('Error executing query:', error);
+          } else {
+            const tableInfo = results2.map((row) => ({
+              tableName:row.table_name,
+              rowCount:row.row_count,
 
-        const tableInfo = results.map((row) => ({
-            tableName: row.TABLE_NAME,
-            rowCount: row.TABLE_ROWS,
-        }));
-        res.json({ tableInfo });
+            }));
+            console.log(tableInfo);
+            res.json({ tableInfo });
+
+          }
+     
+        });
+        
+
     });
 });
+
 app.post('/fetch-data', (req, res) => {
     const selectedTable = req.body.table;
     const dateTimeRange = req.body.dateTimeRange;
