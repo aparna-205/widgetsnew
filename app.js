@@ -33,7 +33,7 @@ app.get('/getTableNames', (req, res) => {
         const connection = mysql.createConnection({
           host: 'database-1.cbjabnlglbz6.ap-south-1.rds.amazonaws.com',
           user: 'admin',
-          password: 'ingo1234',
+          password: 'ingo4321',
           database: 'top5',
         });
         const newQuery = "SELECT * FROM results1 ";
@@ -89,7 +89,7 @@ app.post('/fetch-data', (req, res) => {
         const connection = mysql.createConnection({
           host: 'database-1.cbjabnlglbz6.ap-south-1.rds.amazonaws.com',
           user: 'admin',
-          password: 'ingo1234',
+          password: 'ingo4321',
           database: 'top5',
         });
         
