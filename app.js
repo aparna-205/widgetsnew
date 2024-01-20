@@ -13,7 +13,7 @@ const port = 1000;
 const pool = createPool({
   host: 'database-1.cbjabnlglbz6.ap-south-1.rds.amazonaws.com',
   user: 'admin',
-  password: 'ingo1234',
+  password: 'ingo4321',
   database: 'ingodata',
   connectionLimit: 10
 });
