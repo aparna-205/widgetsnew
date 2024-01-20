@@ -1,28 +1,136 @@
-const { createPool } = require('mysql');
 const express = require('express');
+const path = require('path');
+
+const app = express();
+const port = 3000;
+const { createPool } = require('mysql');
 const xlsx = require('xlsx');
 const mysql = require('mysql');
-
 const imeiToObject = {}; // Define imeiToObject at a higher scope
 const bodyParser = require('body-parser');
 const moment = require('moment');
 const _ = require('lodash');
-const app = express();
+const getTableNamesQuery = `SELECT table_name, table_rows FROM information_schema.tables WHERE table_schema = 'ingodata';`;
+const fs = require('fs');
 
-const port = 1000;
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static('public'));
 const pool = createPool({
   host: 'database-1.cbjabnlglbz6.ap-south-1.rds.amazonaws.com',
   user: 'admin',
   password: 'ingo4321',
   database: 'ingodata',
-  connectionLimit: 10
+  connectionLimit: 10,
+  waitForConnections: true,
+  queueLimit: 0,
+  connectTimeout: 60000, // 60 seconds
 });
-const fs = require('fs');
-const path = require('path');
-const getTableNamesQuery = `SELECT table_name, table_rows FROM information_schema.tables WHERE table_schema = 'ingodata';`;
-
-app.use(bodyParser.urlencoded({ extended: true }));
+// Serve static files from the "public" folder
 app.use(express.static('public'));
+
+// Define a route for the homepage
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+// Define a route for the base.html page
+app.get('/base.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'base.html'));
+});
+app.get('/dashboard.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dashboard.html'));
+});
+app.post('/all-data', (req, res) => {
+  const dateTimeRange = req.body.dateTimeRange;
+  const [fromDateTime, toDateTime] = dateTimeRange.split(' - ');
+  const fromDateTimeObj = new Date(fromDateTime);
+  const toDateTimeObj = new Date(toDateTime);
+  const fromDateTimeSQL = fromDateTimeObj.toISOString().slice(0, 19).replace('T', ' ');
+  const toDateTimeSQL = toDateTimeObj.toISOString().slice(0, 19).replace('T', ' ');
+
+  const connection = mysql.createConnection({
+    host: 'database-1.cbjabnlglbz6.ap-south-1.rds.amazonaws.com',
+    user: 'admin',
+    password: 'ingo4321',
+    database: 'ingodata',
+  });
+
+  const filteredResultsArray = [];
+
+  connection.query('CALL SumSpeedInDateRange(?, ?)', [fromDateTimeObj, toDateTimeObj], (error, results) => {
+      if (error) {
+          console.error('Error executing stored procedure: ', error);
+          return;
+      }
+
+      const actualResults = results.slice(0, results.length - 1);
+      console.log(actualResults[0]);
+      if (actualResults[0].AverageSpeed !== null) {
+          filteredResultsArray.push(actualResults[0]);
+      }
+
+      const connection = mysql.createConnection({
+        host: 'database-1.cbjabnlglbz6.ap-south-1.rds.amazonaws.com',
+        user: 'admin',
+        password: 'ingo4321',
+          database: 'top5',
+      });
+
+      const connection2 = mysql.createConnection({
+        host: 'database-1.cbjabnlglbz6.ap-south-1.rds.amazonaws.com',
+        user: 'admin',
+        password: 'ingo4321',
+        database: 'top5',
+      });
+
+      const newQuery = "SELECT * FROM travel_summary ";
+
+      connection.query(newQuery, (error, results5, fields) => {
+          if (error) {
+              console.error('Error executing query:', error);
+          } else {
+              console.log('Query results:');
+          }
+
+          const datafromtop5 = results5;
+          const odocolumn = datafromtop5.map(item => ({ 'vehicle': item['Object'], 'EndOdometer': item['EndOdometer'] }));
+          const sortdata = odocolumn.sort((a, b) => b['EndOdometer'] - a['EndOdometer']);
+          const top5Records = sortdata.slice(0, 5);
+          const toparray = JSON.stringify(top5Records);
+
+          const Query = "SELECT * FROM results1 ";
+          connection2.query(Query, (error, results2, fields) => {
+              if (error) {
+                  console.error('Error executing query:', error);
+              } else {
+                  console.log("");
+              }
+
+              const countofInactive = results2.map(item => ({ 'vehicle': item['table_name'], 'Count': item['row_count'] }));
+              const countOfZeroCounts = countofInactive.filter(item => item.Count === 0).length;
+              const nonZeroCount = countofInactive.filter(item => item.Count > 0).length;
+
+              const htmlTemplatePath = path.join(__dirname, 'public', 'result2.html');
+              fs.readFile(htmlTemplatePath, 'utf8', (err, template) => {
+                  if (err) {
+                      console.error('Error reading template file:', err);
+                      return res.status(500).send('Error reading template file');
+                  }
+
+                  const renderedHtml = template
+                      .replace('{{fromDateTimeObj}}', fromDateTimeObj)
+                      .replace('{{toDateTimeObj}}', toDateTimeObj)
+                      .replace('{{toparray}}', toparray)
+                      .replace('{{actualResults}}', JSON.stringify(actualResults[0]))
+                      .replace('{{nonZeroCount}}', nonZeroCount)
+                      .replace('{{countOfZeroCounts}}', countOfZeroCounts);
+
+                  res.send(renderedHtml);
+              });
+          });
+      });
+  });
+});
+
 
 app.get('/getTableNames', (req, res) => {
     pool.query(getTableNamesQuery, (err, results) => {
@@ -44,19 +152,13 @@ app.get('/getTableNames', (req, res) => {
             const tableInfo = results2.map((row) => ({
               tableName:row.table_name,
               rowCount:row.row_count,
-
             }));
-            console.log(tableInfo);
             res.json({ tableInfo });
-
+  
           }
-     
         });
-        
-
     });
-});
-
+  });
 app.post('/fetch-data', (req, res) => {
     const selectedTable = req.body.table;
     const dateTimeRange = req.body.dateTimeRange;
@@ -86,29 +188,6 @@ app.post('/fetch-data', (req, res) => {
             `;
             return res.send(noDataHtml);
         }
-        const connection = mysql.createConnection({
-          host: 'database-1.cbjabnlglbz6.ap-south-1.rds.amazonaws.com',
-          user: 'admin',
-          password: 'ingo4321',
-          database: 'top5',
-        });
-        
-        const newQuery = "SELECT * FROM travel_summary ";
-        
-        connection.query(newQuery, (error, results5, fields) => {
-          if (error) {
-            console.error('Error executing query:', error);
-          } else {
-            console.log('Query results:', results5);
-          }
-        const datafromtop5 = results5;
-        const odocolumn = datafromtop5.map(item => ({ 'vehicle': item['Object'], 'EndOdometer': item['EndOdometer'] }));
-        const sortdata = odocolumn.sort((a, b) => b['EndOdometer'] - a['EndOdometer']);
-        const top5Records = sortdata.slice(0, 5);
-          // Close the connection
-        const toparray = JSON.stringify(top5Records); // Parse the JSON string into an array
-
-
 
 const data = results;
 const formattedDataArray = data.map(item => {
@@ -305,12 +384,13 @@ data.forEach((row) => {
     if (row['IGN'] !== 'OM') {
         const currentDate = new Date(row['date_time']);
         const currentavgkm = row['Last Distance (meters)'];
-        if (currentavgkm !== 'NA' && parseFloat(currentavgkm) !== 0) {
+        if (currentavgkm !== 'NA') {
             const formattedDate = currentDate.toISOString().split('T')[0];
             if (!avgKmByDate[formattedDate]) {
                 avgKmByDate[formattedDate] = [];
             }
             avgKmByDate[formattedDate].push(parseFloat(currentavgkm));
+
         }
     }
 });
@@ -318,6 +398,7 @@ const avgKmData = Object.keys(avgKmByDate).map((date) => {
     const kms = avgKmByDate[date];
     const sumKms = kms.reduce((acc, km) => acc + km, 0);
     const averageKm = (sumKms * 0.001);
+
     return {
         date,
         averageKm,
@@ -370,13 +451,9 @@ data.forEach((row) => {
         const formattedDate = currentDate.toISOString().split('T')[0];
         const dayOfWeek = currentDate.getDay(); // 0 (Sunday) to 6 (Saturday)
         const hour = currentDate.getHours();
-
-
-
         if (!groupedData[formattedDate]) {
             groupedData[formattedDate] = {};
         }
-
         if (!groupedData[formattedDate][hour]) {
             groupedData[formattedDate][hour] = {
                 totalKm: 0, 
@@ -403,7 +480,7 @@ for (const date in groupedData) {
 }
 const avgKmByDayAndHourJSON = JSON.stringify(avgKmByDayAndHour);
     const sumOfAverageKms = avgKmData.reduce((acc, dataPoint) => acc + dataPoint.averageKm, 0);
-    const numberOfDays = avgKmData.length;
+    const numberOfDays = avgKmData.length -1 ;
     const averageKmPerDay = (sumOfAverageKms / numberOfDays).toFixed(2);
         const maxSpeedByDate = {};
         data.forEach((row) => {
@@ -487,7 +564,6 @@ const combinedData = dateTimes.map((dateTime, index) => ({
                 .replace('{{avgvoltage}}', avgvoltage)
                 .replace('{{distancecurve}}', distancecurve)
                 .replace('{{voltagecurve}}', voltagecurve)
-                .replace('{{toparray}}',toparray)
                 .replace('{{data}}',JSON.stringify(data))
                 .replace('{{formattedAverageDuration}}', formattedAverageDuration)
                 .replace('{{formattedAverageDurationSubtraction}}', formattedAverageDurationSubtraction)
@@ -503,8 +579,6 @@ const combinedData = dateTimes.map((dateTime, index) => ({
         });
     });
 });
-});
-
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+    console.log(`Server is running at http://localhost:${port}`);
 });
