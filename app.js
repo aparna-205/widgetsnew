@@ -63,7 +63,6 @@ app.post('/all-data', (req, res) => {
       }
 
       const actualResults = results.slice(0, results.length - 1);
-      console.log(actualResults[0]);
       if (actualResults[0].AverageSpeed !== null) {
           filteredResultsArray.push(actualResults[0]);
       }
