@@ -480,7 +480,7 @@ for (const date in groupedData) {
 }
 const avgKmByDayAndHourJSON = JSON.stringify(avgKmByDayAndHour);
     const sumOfAverageKms = avgKmData.reduce((acc, dataPoint) => acc + dataPoint.averageKm, 0);
-    const numberOfDays = avgKmData.length -1 ;
+    const numberOfDays = avgKmData.length ;
     const averageKmPerDay = (sumOfAverageKms / numberOfDays).toFixed(2);
         const maxSpeedByDate = {};
         data.forEach((row) => {
