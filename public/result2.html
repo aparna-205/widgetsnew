@@ -25,6 +25,11 @@
   <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/css/dataTables.bootstrap4.css">
   <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
 </head>
+<style>
+  .alldata-container-custom-height {
+    height: 400px; 
+  }
+</style>
 <body>
     <br>
   <br>
@@ -169,59 +174,14 @@ In active
   <div class="card mb-3" style="overflow:auto;">
     <div class="card-header text-center">Average Odo</div>
     <div class="card-body">
-        <div id="speedGraph" ></div>
-        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-        <script>
-            // Assuming actualResults is a JSON string, parse it
-            function customTickText(value) {
-                // Set your desired limit for characters
-                var charLimit = 6;
-                
-                if (value.length > charLimit) {
-                    return value.substring(0, charLimit) ;
-                } else {
-                    return value;
-                }
-            }
-            const alldata = JSON.parse('{{actualResults}}');
-        
-            // Extract data for x and y axes
-            const xData = alldata.map(entry => customTickText(entry.TableName));
-            const yData = alldata.map(entry => entry.AverageSpeed);
-        
-            const trace2 = {
-                x: xData,
-                y: yData,
-                type: 'bar',
-                type: 'bar',
-                name: 'Bar Chart'
-    
-            };
-        
-            const layout = {
-                xaxis: {
-                    ticklen: 3,
-                    tickangle: -90,
-                    tickmode: 'array',
-                    type: 'category',
-                    automargin: true,
-                    rangeslider: { // Add rangeslider configuration
-                      autorange: true, // Set to false if you want to set initial range
-                  }
-                },
-                yaxis: {
-                    title: 'Odo',
-                },
-            };
-        
-            var config = { responsive: true };
-        
-            Plotly.newPlot('speedGraph', [trace2], layout, config);
-        </script>
-        
-      </div>
-      </div>
-  
+      
+     
+      <div id="alldata-container" class="alldata-container-custom-height" style="overflow:auto;">
+      
+        <div id="loading" style="text-align: center;  color: rgb(161, 126, 11);">
+          <i class="fas fa-spinner fa-spin fa-2x"></i>
+          <p>Loading...</p>
+        </div>
   
 </div>
 </body>
