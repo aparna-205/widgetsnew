@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 
 const app = express();
-const port = 1000;
+const port = 3000;
 const { createPool } = require('mysql');
 const xlsx = require('xlsx');
 const mysql = require('mysql');
@@ -47,49 +47,19 @@ app.post('/all-data', (req, res) => {
   const fromDateTimeSQL = fromDateTimeObj.toISOString().slice(0, 19).replace('T', ' ');
   const toDateTimeSQL = toDateTimeObj.toISOString().slice(0, 19).replace('T', ' ');
 
-  const connection = mysql.createConnection({
-    host: 'database-1.cbjabnlglbz6.ap-south-1.rds.amazonaws.com',
-    user: 'admin',
-    password: 'ingo4321',
-    database: 'ingodata',
-  });
-
-  const filteredResultsArray = [];
-
-  connection.query('CALL SumSpeedInDateRange(?, ?)', [fromDateTimeObj, toDateTimeObj], (error, results) => {
-      if (error) {
-          console.error('Error executing stored procedure: ', error);
-          return;
-      }
-
-      const actualResults = results.slice(0, results.length - 1);
-      if (actualResults[0].AverageSpeed !== null) {
-          filteredResultsArray.push(actualResults[0]);
-      }
-
       const connection = mysql.createConnection({
         host: 'database-1.cbjabnlglbz6.ap-south-1.rds.amazonaws.com',
         user: 'admin',
         password: 'ingo4321',
           database: 'top5',
       });
-
-      const connection2 = mysql.createConnection({
-        host: 'database-1.cbjabnlglbz6.ap-south-1.rds.amazonaws.com',
-        user: 'admin',
-        password: 'ingo4321',
-        database: 'top5',
-      });
-
       const newQuery = "SELECT * FROM travel_summary ";
-
       connection.query(newQuery, (error, results5, fields) => {
           if (error) {
               console.error('Error executing query:', error);
           } else {
               console.log('Query results:');
           }
-
           const datafromtop5 = results5;
           const odocolumn = datafromtop5.map(item => ({ 'vehicle': item['Object'], 'EndOdometer': item['EndOdometer'] }));
           const sortdata = odocolumn.sort((a, b) => b['EndOdometer'] - a['EndOdometer']);
@@ -97,7 +67,7 @@ app.post('/all-data', (req, res) => {
           const toparray = JSON.stringify(top5Records);
 
           const Query = "SELECT * FROM results1 ";
-          connection2.query(Query, (error, results2, fields) => {
+          connection.query(Query, (error, results2, fields) => {
               if (error) {
                   console.error('Error executing query:', error);
               } else {
@@ -119,17 +89,41 @@ app.post('/all-data', (req, res) => {
                       .replace('{{fromDateTimeObj}}', fromDateTimeObj)
                       .replace('{{toDateTimeObj}}', toDateTimeObj)
                       .replace('{{toparray}}', toparray)
-                      .replace('{{actualResults}}', JSON.stringify(actualResults[0]))
                       .replace('{{nonZeroCount}}', nonZeroCount)
                       .replace('{{countOfZeroCounts}}', countOfZeroCounts);
-
                   res.send(renderedHtml);
               });
           });
       });
   });
-});
+app.post('/whole-data', (req, res) => {
+  const dateTimeRange = req.body.dateTimeRange;
+  const [fromDateTime, toDateTime] = dateTimeRange.split(' - ');
+  const fromDateTimeObj = new Date(fromDateTime);
+  const toDateTimeObj = new Date(toDateTime);
+  const fromDateTimeSQL = fromDateTimeObj.toISOString().slice(0, 19).replace('T', ' ');
+  const toDateTimeSQL = toDateTimeObj.toISOString().slice(0, 19).replace('T', ' ');
+  const connection = mysql.createConnection({
+    host: 'database-1.cbjabnlglbz6.ap-south-1.rds.amazonaws.com',
+    user: 'admin',
+    password: 'ingo4321',
+    database: 'ingodata',
+  });
+  const filteredResultsArray = [];
+  connection.query('CALL SumSpeedInDateRange(?, ?)', [fromDateTimeObj, toDateTimeObj], (error, results) => {
+      if (error) {
+          console.error('Error executing stored procedure: ', error);
+          return;
+      }
+      const actualResults = results.slice(0, results.length - 1);
+      if (actualResults[0].AverageSpeed !== null) {
+          filteredResultsArray.push(actualResults[0]);
+          console.log(filteredResultsArray[0]);
+      }
+	    res.json(filteredResultsArray[0]);
 
+    });
+  });
 
 app.get('/getTableNames', (req, res) => {
     pool.query(getTableNamesQuery, (err, results) => {
@@ -141,7 +135,7 @@ app.get('/getTableNames', (req, res) => {
           host: 'database-1.cbjabnlglbz6.ap-south-1.rds.amazonaws.com',
           user: 'admin',
           password: 'ingo4321',
-          database: 'top5',
+            database: 'top5',
         });
         const newQuery = "SELECT * FROM results1 ";
         connection.query(newQuery, (error, results2, fields) => {
