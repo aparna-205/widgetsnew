@@ -672,6 +672,66 @@
                     return value;
                 }
             }
+              $.ajax({
+                type: 'POST',
+                url: '/whole-data',
+                data: formData,
+                dataType: 'json',
+                beforeSend: function () {
+                    // Show loading content before the request is sent
+                    $('#alldata-container #loading').show();
+                },
+                success: function(response) {
+                    // Handle the JSON response
+                    const tableNames = response.map(entry => customTickText(entry.TableName));
+
+                    // Extract data for the bar chart
+                           
+                    const AverageSpeed = response.map(entry => entry.AverageSpeed);
+                
+
+            
+                    // Create a bar graph using Plotly
+                    var barTrace = {
+                        x: tableNames,
+                        y: AverageSpeed,
+                        type: 'bar',
+                        name: 'Bar Chart'
+                    };
+            
+                    var barLayout = {
+                        xaxis: {
+                            ticklen: 3,
+                            tickangle: -90,
+                            tickmode: 'array',
+                            tickvals: tableNames,
+                            type: 'category',
+                            automargin: true,
+                            rangeslider: { // Add rangeslider configuration
+                              autorange: true, // Set to false if you want to set initial range
+                          }
+                        },
+                        xaxis:{
+                          title: 'Vehicles'
+                        },
+                        yaxis: {
+                            title: 'Total Distance',
+                        },
+                    };
+            
+                    var barConfig = { responsive: true };
+            
+                    // Create or update the bar chart in the specified container
+                    Plotly.newPlot('alldata-container', [barTrace], barLayout, barConfig);
+                    $('#alldata-container #loading').hide();
+                    },
+               
+                complete: function() {
+                    // Remove loading message or spinner after the request is complete
+                    $('#alldata-container #loading').hide();
+                }
+            });
+  
         })
     })
     </script>
