@@ -16,7 +16,7 @@ This Widget tell us driving behaviour when we get more acceleration counts in se
 To Understand the Peak Hours/peak days of individual/Selected Vehicles
 ### Top Speed and Average Speed
 To understand the top speed and average speed of vehicle based on selected date range
-
+![Project Screenshot](https://i.imgur.com/46hqhBm.jpg)
 ## Dashboard Page
 ### Top5 Customers
 this widgets takes all vehicles data and caliculate the average km/day of each and every vehicle and select the Top 3 customers based on Average Km
