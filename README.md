@@ -18,7 +18,7 @@ To Understand the Peak Hours/peak days of individual/Selected Vehicles
 To understand the top speed and average speed of vehicle based on selected date range
 
 ## Dashboard Page
-### :Top5 Customers
+### Top5 Customers
 this widgets takes all vehicles data and caliculate the average km/day of each and every vehicle and select the Top 3 customers based on Average Km
-### :Activity 
+### Activity 
 this widget gives the entire fleet activity
