@@ -1,4 +1,4 @@
- html {
+html {
     position: relative;
     min-height: 100%;
   }
@@ -130,7 +130,7 @@
   
   @media (min-width: 992px) {
     #mainNav .navbar-brand {
-      width: 293px;
+      width: 288px;
     }
     #mainNav .navbar-collapse {
       overflow: visible;
@@ -146,7 +146,7 @@
       margin-top: 56px;
     }
     #mainNav .navbar-collapse .navbar-sidenav > .nav-item {
-      width: 293px;
+      width: 288px;
       padding: 0;
     }
     #mainNav .navbar-collapse .navbar-sidenav > .nav-item > .nav-link {
@@ -159,7 +159,7 @@
     }
     #mainNav .navbar-collapse .navbar-sidenav > .nav-item .sidenav-second-level > li,
     #mainNav .navbar-collapse .navbar-sidenav > .nav-item .sidenav-third-level > li {
-      width: 293px;
+      width: 288px;
     }
     #mainNav .navbar-collapse .navbar-sidenav > .nav-item .sidenav-second-level > li > a,
     #mainNav .navbar-collapse .navbar-sidenav > .nav-item .sidenav-third-level > li > a {
@@ -179,7 +179,7 @@
       text-align: center;
     }
     #mainNav .navbar-collapse .navbar-nav > .nav-item.dropdown .dropdown-menu > .dropdown-item > .dropdown-message {
-      max-width: 293px;
+      max-width: 288px;
     }
   }
   
@@ -273,6 +273,7 @@
     .content-wrapper {
       margin-left: 293px;
     }
+
   }
   
   #sidenavToggler i {
@@ -387,7 +388,7 @@
   }
   
   @media (min-width: 992px) {
-    #mainNav.navbar-light .navbar-collapse .navbar-sidenav {
+    #mainNav.navbar-light .navbar-collapse .navbar-sidenav .table-container {
       background: #f8f9fa;
     }
 
@@ -487,8 +488,6 @@
       .table-scroll {
         max-height: 83vh;
         background-color: #edf1f5 ;
-
-        /* Adjust the max height as needed */
         overflow-y: auto; /* Enable vertical scrollbar */
     }
     th {
@@ -530,6 +529,7 @@
     max-height: 82vh; /* Adjust the height for large screens */
   }
 }
+
 .circularDiv {
   border-radius: 50%;
   width: 10px; /* Adjust the size as needed */
