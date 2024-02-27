@@ -109,7 +109,7 @@ app.post('/whole-data', (req, res) => {
     database: 'ingodata',
   });
   const filteredResultsArray = [];
-  connection.query('CALL SumSpeedInDateRange(?, ?)', [fromDateTimeObj, toDateTimeObj], (error, results) => {
+  connection.query('CALL SumOdoInDateRange(?, ?)', [fromDateTimeObj, toDateTimeObj], (error, results) => {
       if (error) {
           console.error('Error executing stored procedure: ', error);
           return;
