@@ -24,7 +24,12 @@ this widgets takes all vehicles data and caliculate the average km/day of each a
 
 ### vehicles Activity 
 this widget gives the entire fleet activity
-
+## Dependencies
+* nodeJs
+* plotly.js
+* MySQL
+* Ajax
+  
 ![Project Screenshot](https://i.imgur.com/HR23mpy.jpg)
 
 ### individual vehicle
