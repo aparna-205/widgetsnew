@@ -4,11 +4,6 @@ A data-driven web dashboard providing deep insights into Electric Vehicle (EV) f
 
 ---
 
-## 🚀 Live Demo
-
-> _Add your deployment link here_
-
----
 
 ## ✨ Widgets Overview
 
